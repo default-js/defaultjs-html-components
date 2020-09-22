@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8" />
+		<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+		<title>Page Title</title>
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+
+		<link rel="stylesheet" type="text/css" href="/css/form.css" />
+		<link rel="stylesheet" type="text/css" href="style.css" />
+	</head>
+	<body>
+		<d-pagination page="1" count="50" size="5">
+			<template>
+				<div class="first-page" @click:delegate="to-page" data-page="0">first</div>
+				<div class="prev" @click:delegate="to-page" data-page="${page - 1}">prev</div>
+				
+
+
+				<div class="prev" @click:delegate="to-page" data-page="${page - 1}">last</div>
+				<div class="last-page" @click:delegate="to-page" data-page="${count}">last</div>
+			</template>
+		</d-pagination>
+
+		<script type="module" src="/browser-bundle.js"></script>
+	</body>
+</html>

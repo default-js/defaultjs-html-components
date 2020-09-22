@@ -1,0 +1,10 @@
+d-selection-list,
+d-selection-list-search,
+d-selection-list-rows,
+d-selection-list-pagination
+{
+    display: block;
+    border: 0.1rem solid black;
+    margin: 1rem 1rem;
+    padding: 1rem 1rem;
+}
