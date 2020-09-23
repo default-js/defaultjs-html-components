@@ -13,7 +13,8 @@ d-pagination nav,
 d-pagination ul {
     display: flex;
 }
-d-pagination {
+d-pagination nav {
+    width: 100%;
     align-items: center;
     justify-content: center;
 }

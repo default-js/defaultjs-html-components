@@ -1,7 +1,7 @@
 import {attributeChangeEventPrefix} from "../Constants";
 
 export const componentEventname = (eventType, node ) => {
-    return node.nodeName + "-" + eventType;
+   return node.nodeName.toLowerCase() + "-" + eventType;
 };
 
 
