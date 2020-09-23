@@ -71,9 +71,10 @@ class Pagination extends Component {
 	}
 
 	async init() {
-		const template = await Template.load(getTemplate(this));
+		const templateElement = getTemplate(this);
+		const template = await Template.load(templateElement, templateElement instanceof URL);
 		let root = this;
-		if (!this.disabledShadowDom && template != TEMPLATE) {
+		if (!this.disabledShadowDom && template.template != TEMPLATE) {
 			this.attachShadow({ mode: "open" });
 			root = this.shadowRoot;
 		}

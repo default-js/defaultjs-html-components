@@ -13,6 +13,7 @@
 		<template id="pagination">
 			<link href="component.css" rel="stylesheet">
 			<nav class="pagination" jstl-if="${pages.length > 1}">
+				<h3>loaded as template from html</h3>
 				<ul>
 					<li class="pagination-first ${page == 1 ? 'disabled' : ''}" ?data-page="${page != 1}" data-page="1">first</li>
 					<li class="pagination-back ${page == 1 ? 'disabled' : ''}" ?data-page="${page != 1}" data-page="${page - 1}">prev</li>
