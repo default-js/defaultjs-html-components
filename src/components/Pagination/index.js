@@ -73,12 +73,12 @@ class Pagination extends Component {
 	async init() {
 		const templateElement = getTemplate(this);
 		const template = await Template.load(templateElement, templateElement instanceof URL);
-		let root = this;
+		this.__root__ = this;
 		if (!this.disabledShadowDom && template.template != TEMPLATE) {
 			this.attachShadow({ mode: "open" });
-			root = this.shadowRoot;
+			this.__root__ = this.shadowRoot;
 		}
-		root.on("click", (event) => {
+		this.__root__.on("click", (event) => {
 			const { target } = event;
 			let page = Number.NaN;
 			page = parseInt(target.attr(ATTR_DATA_PAGE));
@@ -132,7 +132,7 @@ class Pagination extends Component {
 		const size = parseInt(this.attr(ATTR_SIZE) || "10");
 		const data = toData(page, count, size);
 
-		this.renderer.render({ data, container: this.disabledShadowDom ? this : this.shadowRoot });
+		this.renderer.render({ data, container: this.__root__ });
 	}
 }
 
