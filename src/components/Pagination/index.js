@@ -62,8 +62,6 @@ const render = async (pagination, setting) => {
 	const size = parseInt(pagination.attr(ATTR_SIZE) || "10");
 	const data = toData(page, count, size);
 
-	console.log({ data });
-
 	setting.renderer.render({ data, container: pagination });
 };
 
@@ -87,6 +85,28 @@ class Pagination extends Component {
 			render(this, data);
 		});
 	}
+
+	get page(){
+		return parseInt(this.attr(ATTR_PAGE));
+	}
+	set page(page){
+		this.attr(ATTR_PAGE, page);
+	}
+
+	get count(){
+		return parseInt(this.attr(ATTR_COUNT));
+	}
+	set count(count){
+		this.attr(ATTR_COUNT, count);
+	}
+
+	get size(){
+		return parseInt(this.attr(ATTR_SIZE));
+	}
+	set size(size){
+		this.attr(ATTR_SIZE, size);
+	}
+
 }
 
 defineComponent("pagination", Pagination);
