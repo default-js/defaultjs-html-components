@@ -13,7 +13,7 @@ const init = (component) => {
 		delete data.initialize;
 
 		Promise.resolve(component.init()).then(() => {
-			this.trigger(componentEventname("initialzed", this));
+			component.trigger(componentEventname("initialzed", component));
 		});
 	}, initTimeout);
 };

@@ -10,17 +10,51 @@
 		<link rel="stylesheet" type="text/css" href="style.css" />
 	</head>
 	<body>
-		<d-pagination page="1" count="50" size="5">
-			<template>
-				<div class="first-page" @click:delegate="to-page" data-page="0">first</div>
-				<div class="prev" @click:delegate="to-page" data-page="${page - 1}">prev</div>
-				
+		<template id="pagination">
+			<nav class="pagination" jstl-if="${pages.length > 1}">
+				<ul class="page-list">
+					<li class="page ${page == 1 ? 'disabled' : ''}" ?@click="${page == 1}" @click:delegate="pagination-to-page" data-page="1">
+						first
+					</li>
+					<li class="page ${page == 1 ? 'disabled' : ''}" ?@click="${page > 1}" @click:delegate="pagination-to-page" data-page="${page - 1}">
+						prev
+					</li>
+
+					<jstl jstl-foreach="${pages}">
+						<li class="page ${item == page ? 'active' : ''}" ?@click="${item != page}" @click:delegate="pagination-to-page" data-page="${item}">
+							${item}
+						</li>
+					</jstl>
+
+					<li class="page ${page >= count ? 'disabled' : ''}" ?@click="${count > page}" @click:delegate="pagination-to-page" data-page="${page + 1}">
+						next
+					</li>
+					<li class="page ${page >= count ? 'disabled' : ''}" ?@click="${count >= page}" @click:delegate="pagination-to-page" data-page="${count}">
+						prev
+					</li>
+
+				</ul>
+			</nav>
+		</template>
 
 
-				<div class="prev" @click:delegate="to-page" data-page="${page - 1}">last</div>
-				<div class="last-page" @click:delegate="to-page" data-page="${count}">last</div>
-			</template>
-		</d-pagination>
+		<h1>1. page</h1>
+		<d-pagination page="1" count="50" size="5" template="#pagination"></d-pagination>
+		<h1>2. page</h1>
+		<d-pagination page="2" count="50" size="5" template="#pagination"></d-pagination>
+		<h1>3. page</h1>
+		<d-pagination page="3" count="50" size="5" template="#pagination"></d-pagination>
+
+		<h1>25. page</h1>
+		<d-pagination page="25" count="50" size="5" template="#pagination"></d-pagination>
+
+		<h1>48. page</h1>
+		<d-pagination page="48" count="50" size="5" template="#pagination"></d-pagination>
+		<h1>49. page</h1>
+		<d-pagination page="49" count="50" size="5" template="#pagination"></d-pagination>
+		<h1>50. page</h1>
+		<d-pagination page="50" count="50" size="5" template="#pagination"></d-pagination>
+
 
 		<script type="module" src="/browser-bundle.js"></script>
 	</body>

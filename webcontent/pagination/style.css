@@ -1,10 +1,34 @@
-d-selection-list,
-d-selection-list-search,
-d-selection-list-rows,
-d-selection-list-pagination
-{
-    display: block;
-    border: 0.1rem solid black;
-    margin: 1rem 1rem;
-    padding: 1rem 1rem;
+* , *::before, *::after{
+    box-sizing: border-box;
+    margin-top: 0;
 }
+
+html, 
+body {    
+    font-size: 16px;
+}
+
+d-pagination,
+d-pagination nav,
+d-pagination ul {
+    display: flex;
+}
+d-pagination {
+    align-items: center;
+    justify-content: center;
+}
+
+d-pagination li {
+    list-style: none;
+    align-self: center;
+    margin: auto 0.5rem;
+    padding: auto 0.5rem;
+    cursor: pointer;
+}
+d-pagination li.disabled,
+d-pagination li.active {
+    cursor: not-allowed;
+}
+
+
+

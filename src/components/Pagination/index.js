@@ -16,25 +16,36 @@ const getTemplate = (node) => {
 	let template = node.find(":scope > template").first();
 	if (!!template) return template;
 	template = node.attr(ATTR_TEMPLATE);
-	if (!template) template = find(template).first();
+	if (!!template) template = find(template).first();
 	if (!!template) return template;
 	return new URL(template, location.origin);
 };
 
 const toData = (page, count, size) => {
+	const pages = [];
 	const meridian = Math.floor(size / 2);
-	const start = Math.max(1, page - meridian);
-	const end = Math.min(page + Math.min(meridian, count), count);
-	return { start, end, page, count, size };
+	let start = 1;
+	let end = size;
+	if (size > count) end = count;
+	else if (page + meridian > count) {
+		end = count;
+		start = end - size + 1;
+	} else if (page - meridian > 1) {
+		end = page + meridian;
+		start = end - size + 1;
+	}
+	for (let i = start; i <= end; i++) pages.push(i);
+
+	return { start, end, pages, page, count, size };
 };
 
 const render = async (pagination, setting) => {
 	const page = parseInt(pagination.attr(ATTR_PAGE) || "1");
 	const count = parseInt(pagination.attr(ATTR_COUNT) || "0");
 	const size = parseInt(pagination.attr(ATTR_SIZE) || "10");
-    const data = toData(page, count, size);
-    
-    console.log({data});
+	const data = toData(page, count, size);
+
+	console.log({ data });
 
 	setting.renderer.render({ data, container: pagination });
 };
@@ -46,19 +57,20 @@ class Pagination extends Component {
 
 	constructor() {
 		super();
-		this.on(componentEventname("change", this), () => {
-			const data = DATA.data(this);
-			render(this, data);
-		});
 	}
 
 	async init() {
 		const data = DATA.data(this);
 		const template = await Template.load(getTemplate(this));
-		data.renderer = new Renderer({template});
+		data.renderer = new Renderer({ template });
 		render(this, data);
+
+		this.on(componentEventname("change", this), () => {
+			const data = DATA.data(this);
+			render(this, data);
+		});
 	}
-};
+}
 
 defineComponent("pagination", Pagination);
 export default Pagination;
