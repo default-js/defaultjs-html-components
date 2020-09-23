@@ -12,27 +12,26 @@
 	<body>
 		<template id="pagination">
 			<nav class="pagination" jstl-if="${pages.length > 1}">
-				<ul class="page-list">
-					<li class="page ${page == 1 ? 'disabled' : ''}" ?@click="${page == 1}" @click:delegate="pagination-to-page" data-page="1">
+				<ul>
+					<li class="pagination-first ${page == 1 ? 'disabled' : ''}" ?@click:delegate="${page != 1}" @click:delegate="pagination-to-page" data-page="1">
 						first
 					</li>
-					<li class="page ${page == 1 ? 'disabled' : ''}" ?@click="${page > 1}" @click:delegate="pagination-to-page" data-page="${page - 1}">
+					<li class="pagination-back ${page == 1 ? 'disabled' : ''}" ?@click:delegate="${page > 1}" @click:delegate="pagination-to-page" data-page="${page - 1}">
 						prev
 					</li>
 
 					<jstl jstl-foreach="${pages}">
-						<li class="page ${item == page ? 'active' : ''}" ?@click="${item != page}" @click:delegate="pagination-to-page" data-page="${item}">
+						<li class="pagination-page ${item == page ? 'active' : ''}" ?@click:delegate="${item != page}" @click:delegate="pagination-to-page" data-page="${item}">
 							${item}
 						</li>
 					</jstl>
 
-					<li class="page ${page >= count ? 'disabled' : ''}" ?@click="${count > page}" @click:delegate="pagination-to-page" data-page="${page + 1}">
+					<li class="pagination-next ${page >= count ? 'disabled' : ''}" ?@click:delegate="${count > page}" @click:delegate="pagination-to-page" data-page="${page + 1}">
 						next
 					</li>
-					<li class="page ${page >= count ? 'disabled' : ''}" ?@click="${count >= page}" @click:delegate="pagination-to-page" data-page="${count}">
+					<li class="pagination-last ${page >= count ? 'disabled' : ''}" ?@click:delegate="${count != page}" @click:delegate="pagination-to-page" data-page="${count}">
 						prev
 					</li>
-
 				</ul>
 			</nav>
 		</template>
@@ -54,6 +53,10 @@
 		<d-pagination page="49" count="50" size="5" template="#pagination"></d-pagination>
 		<h1>50. page</h1>
 		<d-pagination page="50" count="50" size="5" template="#pagination"></d-pagination>
+
+
+		<h1>without defined template</h1>
+		<d-pagination page="25" count="50" size="5"></d-pagination>
 
 
 		<script type="module" src="/browser-bundle.js"></script>

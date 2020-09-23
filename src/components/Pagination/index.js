@@ -12,13 +12,30 @@ const ATTRIBUTES = [ATTR_PAGE, ATTR_COUNT, ATTR_SIZE, ATTR_TEMPLATE];
 
 const DATA = new WeakData();
 
+const TEMPLATE = create(`
+<nav class="pagination" jstl-if="\${pages.length > 1}">
+	<ul>
+		<li class="pagination-first \${page == 1 ? 'disabled' : ''}" ?@click:delegate="\${page != 1}" @click:delegate="pagination-to-page" data-page="1">first</li>
+		<li class="pagination-back \${page == 1 ? 'disabled' : ''}" ?@click:delegate="\${page > 1}" @click:delegate="pagination-to-page" data-page="\${page - 1}">prev</li>
+
+		<jstl jstl-foreach="\${pages}">
+			<li class="pagination-page \${item == page ? 'active' : ''}" ?@click:delegate="\${item != page}" @click:delegate="pagination-to-page" data-page="\${item}">\${item}</li>
+		</jstl>
+
+		<li class="pagination-next \${page >= count ? 'disabled' : ''}" ?@click:delegate="\${count > page}" @click:delegate="pagination-to-page" data-page="\${page + 1}">next</li>
+		<li class="pagination-last \${page >= count ? 'disabled' : ''}" ?@click:delegate="\${count != page}" @click:delegate="pagination-to-page" data-page="\${count}">last</li>
+	</ul>
+</nav>
+`, true);
+
 const getTemplate = (node) => {
 	let template = node.find(":scope > template").first();
 	if (!!template) return template;
-	template = node.attr(ATTR_TEMPLATE);
-	if (!!template) template = find(template).first();
+	const value = node.attr(ATTR_TEMPLATE);
+	if(!value) return TEMPLATE;
+	if (!!value) template = find(value).first();
 	if (!!template) return template;
-	return new URL(template, location.origin);
+	return new URL(value, location.origin);
 };
 
 const toData = (page, count, size) => {
