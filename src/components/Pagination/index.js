@@ -1,18 +1,17 @@
 import defineComponent from "../../utils/DefineComponentHelper";
 import { componentEventname } from "../../utils/EventHelper";
 import { Renderer, Template } from "@default-js/defaultjs-template-language";
+import { loadTemplate, ATTR_TEMPLATE } from "../../TemplateHelper";
 import Component from "../../Component";
-import WeakData from "../../utils/WeakData";
 
 const ATTR_PAGE = "page";
 const ATTR_COUNT = "count";
 const ATTR_SIZE = "size";
-const ATTR_TEMPLATE = "template";
 const ATTR_DISABLED_SHADOW_DOM = "disabled-shadow-dom";
 const ATTR_DATA_PAGE = "data-page";
 const ATTRIBUTES = [ATTR_PAGE, ATTR_COUNT, ATTR_SIZE, ATTR_TEMPLATE];
 
-const TEMPLATE = create(
+const TEMPLATE = Template.load(
 	`
 <nav class="pagination" jstl-if="\${pages.length > 1}">
 	<ul>
@@ -28,20 +27,8 @@ const TEMPLATE = create(
 	</ul>
 </nav>
 `,
-	true,
+	false,
 );
-
-const getTemplate = (node) => {
-	let template = node.find(":scope > template").first();
-	if (!!template) return template;
-	const value = node.attr(ATTR_TEMPLATE);
-	if (!value) return TEMPLATE;
-	try {
-		template = find(value).first();
-		if (!!template) return template;
-	} catch (e) {}
-	return new URL(value, location.href);
-};
 
 const toData = (page, count, size) => {
 	const pages = [];
@@ -70,11 +57,10 @@ class Pagination extends Component {
 		super();
 	}
 
-	async init() {
-		const templateElement = getTemplate(this);
-		const template = await Template.load(templateElement, templateElement instanceof URL);
+	async init() {		
+		const template = await loadTemplate(this, TEMPLATE);
 		this.__root__ = this;
-		if (!this.disabledShadowDom && template.template != TEMPLATE) {
+		if (!this.disabledShadowDom && template != TEMPLATE) {
 			this.attachShadow({ mode: "open" });
 			this.__root__ = this.shadowRoot;
 		}
@@ -82,7 +68,7 @@ class Pagination extends Component {
 			const { target } = event;
 			let page = Number.NaN;
 			page = parseInt(target.attr(ATTR_DATA_PAGE));
-			if(Number.isNaN(page)) {
+			if (Number.isNaN(page)) {
 				const parent = target.parent("[" + ATTR_DATA_PAGE + "]");
 				if (parent) page = parseInt(parent.attr(ATTR_DATA_PAGE));
 			}

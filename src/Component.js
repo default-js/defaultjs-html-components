@@ -4,7 +4,6 @@ import { attributeChangeEventname, componentEventname } from "./utils/EventHelpe
 import WeakData from "./utils/WeakData";
 
 const TIMEOUTS = new WeakData();
-
 const init = (component) => {
 	const data = TIMEOUTS.data(component);
 	if (data.initialize) clearTimeout(data.initialize);
