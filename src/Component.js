@@ -2,6 +2,7 @@ import { initTimeout, triggerTimeout } from "./Constants";
 import "@default-js/defaultjs-extdom";
 import { attributeChangeEventname, componentEventname } from "./utils/EventHelper";
 import WeakData from "./utils/WeakData";
+import Ready from "./Ready";
 
 const TIMEOUTS = new WeakData();
 const init = (component) => {
@@ -12,6 +13,7 @@ const init = (component) => {
 		delete data.initialize;
 
 		Promise.resolve(component.init()).then(() => {
+			component.ready.resolve();
 			component.trigger(componentEventname("initialzed", component));
 		});
 	}, initTimeout);
@@ -20,12 +22,13 @@ const init = (component) => {
 class Component extends HTMLElement {
 	constructor() {
 		super();
+		this.ready = new Ready();
 	}
 
 	async init() {}
 
 	connectedCallback() {
-		this.init(this);
+		init(this);
 	}
 
 	adoptedCallback() {
