@@ -1,4 +1,4 @@
-updateimport defineComponent from "../../utils/DefineComponentHelper";
+import defineComponent from "../../utils/DefineComponentHelper";
 import JsonData from "../JsonData";
 import {Requester} from "@default-js/defaultjs-dynamic-requester"
 
@@ -17,7 +17,7 @@ class Request extends JsonData {
 		return this.json;
 	}
 
-	get requester(url, data){
+	get requester(){
 		if(this.__requester)
 			this.__requester = new Requester(this.request);
 		

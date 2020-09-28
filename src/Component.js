@@ -25,7 +25,7 @@ class Component extends HTMLElement {
 	async init() {}
 
 	connectedCallback() {
-		init(this);
+		this.init(this);
 	}
 
 	adoptedCallback() {
@@ -33,13 +33,9 @@ class Component extends HTMLElement {
 	}
 
 	attributeChangedCallback(name, oldValue, newValue) {
-		if (oldValue != newValue) {
-			const type = typeof this[name];
-			if (type !== "undefined" && type !== "function") this[name] = newValue;
-			if (this.isConnected) {
-				this.trigger(triggerTimeout, attributeChangeEventname(name, this));
-				this.trigger(triggerTimeout, componentEventname("change", this));
-			}
+		if (oldValue != newValue && this.isConnected) {
+			this.trigger(triggerTimeout, attributeChangeEventname(name, this));
+			this.trigger(triggerTimeout, componentEventname("change", this));
 		}
 	}
 }
