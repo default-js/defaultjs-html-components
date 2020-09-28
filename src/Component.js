@@ -22,7 +22,7 @@ const init = (component) => {
 class Component extends HTMLElement {
 	constructor() {
 		super();
-		this.ready = new Ready();
+		this.ready = Ready();
 	}
 
 	async init() {}

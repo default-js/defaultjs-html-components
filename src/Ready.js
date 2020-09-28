@@ -1,10 +1,12 @@
-class Ready {
-	constructor() {
-		this.done = new Promise((resolve, reject) => {
-			this.resolve = resolve;
-			this.reject = reject;
-		});
-	}
-}
+export default () => {
+	let resolve , reject = null;
+	const result = new Promise((r, e) => {
+		resolve = r;
+		reject = e;
+	});
 
-export default Ready;
+	result.resolve = resolve;
+	result.reject = reject;
+
+	return result;
+};
