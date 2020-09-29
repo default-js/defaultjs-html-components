@@ -28,7 +28,8 @@ class Component extends HTMLElement {
 	async init() {}
 
 	connectedCallback() {
-		init(this);
+		if(this.ownerDocument == document)
+			init(this);
 	}
 
 	adoptedCallback() {
