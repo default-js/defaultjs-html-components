@@ -1,7 +1,18 @@
 import { componentPrefix } from "../Constants";
-export default (name, clazz, options) => {
-	const componentName = componentPrefix + name;
-	if (!customElements.get(componentName)) {
-		customElements.define(componentName, clazz, options);
+
+export const toNodeName = (name, prefix) => {
+	if(typeof prefix === "string")
+		return prefix + name;
+		
+	return componentPrefix + name;
+};
+
+export const define = function(clazz, options) {
+	const nodename = clazz.NODENAME;
+	if (!customElements.get(nodename)) {
+		customElements.define(nodename, clazz, options);
 	}
 };
+
+
+export default define; 

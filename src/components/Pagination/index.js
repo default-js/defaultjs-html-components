@@ -1,15 +1,12 @@
-import defineComponent from "../../utils/DefineComponentHelper";
+import { toNodeName, define } from "../../utils/DefineComponentHelper";
 import { componentEventname } from "../../utils/EventHelper";
 import { Renderer, Template } from "@default-js/defaultjs-template-language";
 import { loadTemplate, ATTR_TEMPLATE } from "../../TemplateHelper";
 import Component from "../../Component";
 
-const ATTR_PAGE = "page";
-const ATTR_COUNT = "count";
-const ATTR_SIZE = "size";
-const ATTR_DISABLED_SHADOW_DOM = "disabled-shadow-dom";
-const ATTR_DATA_PAGE = "data-page";
-const ATTRIBUTES = [ATTR_PAGE, ATTR_COUNT, ATTR_SIZE, ATTR_TEMPLATE];
+
+const NODENAME = toNodeName("pagination");
+
 
 const TEMPLATE = Template.load(
 	`
@@ -48,10 +45,19 @@ const toData = (page, count, size) => {
 	return { start, end, pages, page, count, size };
 };
 
+const ATTR_PAGE = "page";
+const ATTR_COUNT = "count";
+const ATTR_SIZE = "size";
+const ATTR_DISABLED_SHADOW_DOM = "disabled-shadow-dom";
+const ATTR_DATA_PAGE = "data-page";
+const ATTRIBUTES = [ATTR_PAGE, ATTR_COUNT, ATTR_SIZE, ATTR_TEMPLATE];
+
 class Pagination extends Component {
 	static get observedAttributes() {
 		return ATTRIBUTES;
 	}
+
+	static get NODENAME() { return NODENAME; }
 
 	constructor() {
 		super();
@@ -123,5 +129,5 @@ class Pagination extends Component {
 	}
 }
 
-defineComponent("pagination", Pagination);
+define(Pagination);
 export default Pagination;
