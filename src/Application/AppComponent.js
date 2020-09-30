@@ -42,18 +42,18 @@ class AppComponent extends Component {
             route = findRoute(this, route.target);
 
         if (this.__route__) this.__route__.active = false;
-
-        const component = route ? await route.component() : null;
-        this.view.display(component);
+        await this.view.display(route);
         this.__route__ = route;
         route.active = true;
     }
 
 	get view() {
-		if (!this.__view__)
+		if (!this.__view__){
 			this.__view__ = findClosestInDepth(this.root, (node) => {
 				return node instanceof View;
 			});
+			this.__view__.app = this;
+		}
 
 		return this.__view__;
 	}

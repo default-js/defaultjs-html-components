@@ -1,50 +1,59 @@
 import Component from "../../Component";
-import {define } from "../../utils/DefineComponentHelper";
+import { define } from "../../utils/DefineComponentHelper";
+import { loadTemplate, ATTR_TEMPLATE } from "../../TemplateHelper";
+import { Renderer, Template } from "@default-js/defaultjs-template-language";
 import Resolver from "@default-js/defaultjs-expression-language/src/ExpressionResolver";
 import NODENAME from "./Nodename";
-import {EVENT_CLICK, EVENT_ACTIVATE, EVENT_DEACTIVATE}  from "./Events";
-import {ATTR_NAME, ATTR_ACTIVE, ATTR_TEMPLATE, ATTR_COMPONENT_TAG, ATTR_COMPONENT_TAG_ATTRIBUTES} from "./Attributes"
+import { EVENT_CLICK, EVENT_ACTIVATE, EVENT_DEACTIVATE } from "./Events";
+import { ATTR_NAME, ATTR_ACTIVE, ATTR_COMPONENT_TAG, ATTR_COMPONENT_TAG_ATTRIBUTES, ATTR_STATEFUL } from "./Attributes";
 
-const ATTRIBUTES = [ATTR_NAME, ATTR_TEMPLATE, ATTR_COMPONENT_TAG, ATTR_COMPONENT_TAG_ATTRIBUTES];
+const ATTRIBUTES = [ATTR_NAME, ATTR_TEMPLATE, ATTR_COMPONENT_TAG, ATTR_COMPONENT_TAG_ATTRIBUTES, ATTR_STATEFUL];
 const EVENTS = [EVENT_CLICK, EVENT_ACTIVATE, EVENT_DEACTIVATE];
-const getTagAttributes = async (route) => {	
+const getTagAttributes = async (route) => {
 	const attributes = route.attr(ATTR_COMPONENT_TAG_ATTRIBUTES) || "{}";
 	return Resolver.resolve(attributes, {}, {});
-}
+};
 
-const buildComponent = async (route) =>{
-	const tag = route.attr(ATTR_COMPONENT_TAG);
-	const clazz = customElements.get(tag);
-	const attributes = await getTagAttributes(route);
-	
-	const element = new clazz();
-	for(attribute in attributes){
-		const value = attributes[attribute];
-		if(typeof value === "string")
-			element.attr(attribute, value);
+const buildComponent = async (route) => {
+	if (route.hasAttribute(ATTR_TEMPLATE)) {
+		if (!route.__template__) route.__template__ = loadTemplate(route, null);
+		return route.__template__;
+	} else {
+		const tag = route.attr(ATTR_COMPONENT_TAG);
+		const clazz = customElements.get(tag);
+		const attributes = await getTagAttributes(route);
+
+		const element = new clazz();
+		for (attribute in attributes) {
+			const value = attributes[attribute];
+			if (typeof value === "string") element.attr(attribute, value);
+		}
+
+		return element;
 	}
-
-	return element;
-}
+};
 
 class Route extends Component {
 	static get observedAttributes() {
 		return ATTRIBUTES;
 	}
 
-	static get NODENAME() { return NODENAME; }
+	static get NODENAME() {
+		return NODENAME;
+	}
 
-	static get EVENTS() { return EVENTS; }
+	static get EVENTS() {
+		return EVENTS;
+	}
 
 	constructor() {
 		super();
 		this.on("click", () => {
 			this.trigger(EVENT_CLICK);
 		});
-	}	
+	}
 
-	async init() {
-	}	
+	async init() {}
 
 	get name() {
 		return this.attr(ATTR_NAME);
@@ -62,17 +71,19 @@ class Route extends Component {
 				this.trigger(EVENT_ACTIVATE);
 			} else {
 				this.trigger(EVENT_DEACTIVATE);
-				delete this.__component__;
+				if (!this.hasAttribute(ATTR_STATEFUL)) delete this.__component__;
 			}
-
 		}
 	}
 
-	async component(){
-		if (!this.__component__) {			
+	async render({ view, data, app }) {
+		if (!this.__component__) {
 			this.__component__ = await buildComponent(this);
-		}
-		return this.__component__;
+			if (this.__component__ instanceof Template) {
+				await Renderer.render({ container: view, data, template: this.__component__ });
+				this.__component__ = NodeList.from(view.childNodes);
+			} else view.append(this.__component__);
+		} else view.append(this.__component__);
 	}
 }
 

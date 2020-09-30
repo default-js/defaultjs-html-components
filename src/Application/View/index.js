@@ -11,17 +11,22 @@ class View extends Component {
 		super();
 	}
 
-	get root(){
+	get root() {
 		return this;
 	}
 
-	display(component) {		
-		this.root.empty();
-		if(component)
-			this.root.append(component);
+	get app() {
+		return this.__app__;
 	}
 
+	set app(app) {
+		this.__app__ = app;
+	}
 
+	async display(route) {
+		this.root.empty();
+		if (route) route.render({ view: this.root, data: this.app.store, app: this.app });
+	}
 }
 define(View);
 export default View;
