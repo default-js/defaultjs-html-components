@@ -16,7 +16,8 @@ class AppComponent extends Component {
                 if(this.__activeRoute__)
                     this.__activeRoute__.active = false;
 
-                
+                this.view.empty();
+                route.appendTo(this.view);                
                 
                 this.__activeRoute__ = route;
                 route.active = true;
