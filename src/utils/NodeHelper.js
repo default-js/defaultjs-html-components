@@ -14,10 +14,10 @@ const findClosest = (node, depth, check) => {
         return {node, depth}
 
     let result = null;
-    for(child in node.childNodes){
-        const item = findClosestChild(child, depth + 1));
+    for(let child of node.childNodes){
+        const item = findClosest(child, depth + 1, check);
 
-        if(result == null || result.depth > item.depth)            
+        if(item != null && (result == null || result.depth > item.depth))            
             result = item;
     }
 
@@ -26,5 +26,5 @@ const findClosest = (node, depth, check) => {
 
 export const findClosestInDepth = (node, check) => {
     const closest = findClosest(node, 0, check);
-    return closest.node;
+    return closest != null ? closest.node : null;
 }

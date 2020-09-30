@@ -1,10 +1,11 @@
+import Component from "../../Component";
 import {define } from "../../utils/DefineComponentHelper";
 import Resolver from "@default-js/defaultjs-expression-language/src/ExpressionResolver";
 import NODENAME from "./Nodename";
 import {EVENT_CLICK, EVENT_ACTIVATE, EVENT_DEACTIVATE}  from "./Events";
-import {ATTR_TEMPLATE, ATTR_COMPONENT_TAG, ATTR_COMPONENT_TAG_ATTRIBUTES} from "./Attributes"
+import {ATTR_NAME, ATTR_ACTIVE, ATTR_TEMPLATE, ATTR_COMPONENT_TAG, ATTR_COMPONENT_TAG_ATTRIBUTES} from "./Attributes"
 
-const ATTRIBUTES = [ATTR_TEMPLATE, ATTR_COMPONENT_TAG, ATTR_COMPONENT_TAG_ATTRIBUTES];
+const ATTRIBUTES = [ATTR_NAME, ATTR_TEMPLATE, ATTR_COMPONENT_TAG, ATTR_COMPONENT_TAG_ATTRIBUTES];
 const EVENTS = [EVENT_CLICK, EVENT_ACTIVATE, EVENT_DEACTIVATE];
 const getTagAttributes = async (route) => {	
 	const attributes = route.attr(ATTR_COMPONENT_TAG_ATTRIBUTES) || "{}";
@@ -12,9 +13,9 @@ const getTagAttributes = async (route) => {
 }
 
 const buildComponent = async (route) =>{
-	const tag = route.attr(ATTR_TAG);
+	const tag = route.attr(ATTR_COMPONENT_TAG);
 	const clazz = customElements.get(tag);
-	const attributes = await getTagAttributes();
+	const attributes = await getTagAttributes(route);
 	
 	const element = new clazz();
 	for(attribute in attributes){
@@ -45,6 +46,10 @@ class Route extends Component {
 	async init() {
 	}	
 
+	get name() {
+		return this.attr(ATTR_NAME);
+	}
+
 	get active() {
 		return this.hasAttribute(ATTR_ACTIVE);
 	}
@@ -63,14 +68,9 @@ class Route extends Component {
 		}
 	}
 
-	get component(){
-		return this.__component__;
-	}
-
-	async appendTo({container}) {
+	async component(){
 		if (!this.__component__) {			
 			this.__component__ = await buildComponent(this);
-			container.append(this.__component__);
 		}
 		return this.__component__;
 	}
