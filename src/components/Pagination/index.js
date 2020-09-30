@@ -19,7 +19,7 @@ const TEMPLATE = Template.load(
 		<li class="pagination-back \${page == 1 ? 'disabled' : ''}" ?data-page="\${page != 1}" data-page="\${page - 1}">prev</li>
 
 		<jstl jstl-foreach="\${pages}">
-			<li class="pagination-page \${page == item ? "active" : ''}" ?data-page="\${page != item}" data-page="\${item}">\${item}</li>
+			<li class="pagination-page \${page == item ? 'active' : ''}" ?data-page="\${page != item}" data-page="\${item}">\${item}</li>
 		</jstl>
 
 		<li class="pagination-next \${page >= count ? 'disabled' : ''}" ?data-page="\${count > page}" data-page="\${page + 1}">next</li>
