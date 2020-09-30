@@ -25,6 +25,6 @@ const findClosest = (node, depth, check) => {
 }
 
 export const findClosestInDepth = (node, check) => {
-    const closest = findClosestChild(node, 0, check);
+    const closest = findClosest(node, 0, check);
     return closest.node;
 }

@@ -4,7 +4,8 @@ import {EVENT_CLICK as ROUTE_CLICK} from "./Route/Events";
 import Route from "./Route";
 import View from "./View";
 
-class AppComponent extends Component {
+class AppComponent extends Component {    
+
     constructor() {
         super();
 
