@@ -43,7 +43,7 @@
 	},
 	"homepage": "https://github.com/default-js/defaultjs-html-components#readme",
 	"dependencies": {
-		"@default-js/defaultjs-common-utils": "^0.6.0",
+		"@default-js/defaultjs-common-utils": "^0.10.0",
 		"@default-js/defaultjs-dynamic-requester": "^1.0.0-beta.1",
 		"@default-js/defaultjs-expression-language": "^1.0.0-beta.12",
 		"@default-js/defaultjs-extdom": "^1.0.0-beta.25",
