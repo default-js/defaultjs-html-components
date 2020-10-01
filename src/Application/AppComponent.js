@@ -41,6 +41,8 @@ class AppComponent extends Component {
         else if(route instanceof RouteLink)
             route = findRoute(this, route.target);
 
+		if(this.__route__ == route) return;
+
         if (this.__route__) this.__route__.active = false;
         await this.view.display(route);
         this.__route__ = route;

@@ -49,7 +49,8 @@ class Route extends Component {
 	constructor() {
 		super();
 		this.on("click", () => {
-			this.trigger(EVENT_CLICK);
+			if(!this.active)
+				this.trigger(EVENT_CLICK);
 		});
 	}
 
