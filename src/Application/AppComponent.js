@@ -49,7 +49,7 @@ class AppComponent extends Component {
         if(typeof route === "string")
             route = findRoute(this, route);        
         else if(route instanceof RouteLink){
-			context = buildRouteContext(route.context, this);
+			context = await buildRouteContext(route.context, this);
             route = findRoute(this, route.target);
 		}
 
