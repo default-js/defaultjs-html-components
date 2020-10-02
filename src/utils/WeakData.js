@@ -13,7 +13,7 @@ export default class WeakData {
 	}
 
 	value(reference, key, value) {
-		if (arguments.length == 2) this.data(reference)[key];
+		if (arguments.length == 2) return this.data(reference)[key];
 		else this.data(reference)[key] = value;
 	}
 };

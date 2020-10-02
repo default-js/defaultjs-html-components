@@ -2,10 +2,10 @@ import Component from "../../Component";
 import { define } from "../../utils/DefineComponentHelper";
 import NODENAME from "./Nodename";
 import { EVENT_TO_ROUTE } from "./Events";
+import { ATTR_TARGET, ATTR_CONTEXT} from "./Attributes";
 import {} from "../../utils/NodeHelper";
 
-export const ATTR_TARGET = "target";
-const ATTRIBUTES = [ATTR_TARGET];
+const ATTRIBUTES = [ATTR_TARGET, ATTR_CONTEXT];
 
 const EVENTS = [EVENT_TO_ROUTE];
 
@@ -34,6 +34,10 @@ class RouteLink extends Component {
 
 	get target() {
 		return this.attr(ATTR_TARGET);
+	}
+	
+	get context(){
+		return this.attr(ATTR_CONTEXT);
 	}
 }
 

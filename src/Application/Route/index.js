@@ -1,7 +1,6 @@
 import Component from "../../Component";
 import { define } from "../../utils/DefineComponentHelper";
 import { loadTemplate, ATTR_TEMPLATE } from "../../TemplateHelper";
-import { Renderer, Template } from "@default-js/defaultjs-template-language";
 import Resolver from "@default-js/defaultjs-expression-language/src/ExpressionResolver";
 import NODENAME from "./Nodename";
 import { EVENT_CLICK, EVENT_ACTIVATE, EVENT_DEACTIVATE } from "./Events";
@@ -68,23 +67,30 @@ class Route extends Component {
 		const current = this.active;
 		if (active != current) {
 			this.attr(ATTR_ACTIVE, active ? "" : null);
-			if (active) {
+			if (active)
 				this.trigger(EVENT_ACTIVATE);
-			} else {
+			else 
 				this.trigger(EVENT_DEACTIVATE);
-				if (!this.hasAttribute(ATTR_STATEFUL)) delete this.__component__;
-			}
 		}
 	}
+	
+	get stateful() {
+		return this.attr(ATTR_STATEFUL);
+	}
 
-	async render({ view, data, app }) {
+	async component() {
+		
+		return buildComponent(this);
+		/*
 		if (!this.__component__) {
 			this.__component__ = await buildComponent(this);
 			if (this.__component__ instanceof Template) {
 				await Renderer.render({ container: view, data, template: this.__component__ });
 				this.__component__ = NodeList.from(view.childNodes);
-			} else view.append(this.__component__);
-		} else view.append(this.__component__);
+			}
+		}
+		
+		return this.__component__;*/
 	}
 }
 
