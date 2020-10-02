@@ -14,7 +14,7 @@ const findRoute = (app, name) => {
     return app.find(selector).first();
 }
 
-const buildRouteContext = (context, app) => {
+const buildRouteContext = async (context, app) => {
 	try{
 		return Resolver.resolve(context, app.store, null);
 	} catch(e){

@@ -27,7 +27,7 @@ class View extends Component {
 		this.__app__ = app;
 	}
 
-	async display({ route, data, view }) {
+	async display({ route, context, view }) {
 		if (view)
 			throw new Error("you must override the display function!");
 		this.root.empty();
@@ -48,7 +48,7 @@ class View extends Component {
 				component = NodeList.from(view.childNodes);
 			} else {
 				if (component instanceof View)
-					await component.display({ route, data, view: this })
+					await component.display({ route, context, view: this })
 				this.root.append(component);
 			}
 
@@ -56,7 +56,7 @@ class View extends Component {
 				ROUTEDATA.value(route, "component", component);
 		} else {
 			if (component instanceof View)
-				await component.display({ route, data, view: this })
+				await component.display({ route, context, view: this })
 			this.root.append(component);
 		}
 	}
