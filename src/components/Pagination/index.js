@@ -1,7 +1,7 @@
 import { toNodeName, define } from "../../utils/DefineComponentHelper";
 import { componentEventname } from "../../utils/EventHelper";
 import { Renderer, Template } from "@default-js/defaultjs-template-language";
-import { loadTemplate, ATTR_TEMPLATE } from "../../TemplateHelper";
+import { loadTemplate, ATTR_TEMPLATE } from "../../utils/TemplateHelper";
 import Component from "../../Component";
 
 
