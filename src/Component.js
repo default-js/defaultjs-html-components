@@ -12,10 +12,9 @@ const init = (component) => {
 	data.initialize = setTimeout(async () => {
 		delete data.initialize;
 
-		Promise.resolve(component.init()).then(() => {
-			component.ready.resolve();
-			component.trigger(componentEventname("initialzed", component));
-		});
+		await component.init()
+		component.ready.resolve();
+		component.trigger(componentEventname("initialzed", component));
 	}, initTimeout);
 };
 
