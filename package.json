@@ -1,7 +1,7 @@
 {
 	"name": "@default-js/defaultjs-html-components",
 	"buildname": "defaultjs-html-components",
-	"version": "1.0.0-beta.24",
+	"version": "1.0.0-beta.25",
 	"description": "Useful web components",
 	"main": "./index.js",
 	"scripts": {
@@ -45,7 +45,7 @@
 	"dependencies": {
 		"@default-js/defaultjs-common-utils": "^0.10.0",
 		"@default-js/defaultjs-dynamic-requester": "^1.0.0-beta.1",
-		"@default-js/defaultjs-expression-language": "^1.0.0-beta.12",
+		"@default-js/defaultjs-expression-language": "^1.0.0-beta.13",
 		"@default-js/defaultjs-extdom": "^1.0.0-beta.25",
 		"@default-js/defaultjs-template-language": "^1.0.0-beta.19"
 	},
