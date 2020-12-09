@@ -20,7 +20,7 @@ const TEMPLATE = Template.load(
 		</jstl>
 
 		<li class="pagination-next \${page >= count ? 'disabled' : ''}" ?data-page="\${count > page}" data-page="\${page + 1}">next</li>
-		<li class="pagination-last \${page >= count ? 'disabled' : ''}" ?data-page="\${count > page}" data-page="\${count}">prev</li>
+		<li class="pagination-last \${page >= count ? 'disabled' : ''}" ?data-page="\${count > page}" data-page="\${count}">last</li>
 	</ul>
 </nav>
 `,
