@@ -1,3 +1,4 @@
+import GLOBAL from "@default-js/defaultjs-common-utils/src/Global";
 import utils from "./src/utils";
 import Ready from "./src/Ready";
 import Component from "./src/Component";
