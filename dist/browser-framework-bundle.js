@@ -104,7 +104,7 @@ __webpack_require__.r(__webpack_exports__);
 
 
 
-const pack = {VERSION : "1.0.3", utils: _src_utils__WEBPACK_IMPORTED_MODULE_1__["default"], Ready: _src_Ready__WEBPACK_IMPORTED_MODULE_2__["default"], Component: _src_Component__WEBPACK_IMPORTED_MODULE_3__["default"] };
+const pack = {VERSION : "1.0.4", utils: _src_utils__WEBPACK_IMPORTED_MODULE_1__["default"], Ready: _src_Ready__WEBPACK_IMPORTED_MODULE_2__["default"], Component: _src_Component__WEBPACK_IMPORTED_MODULE_3__["default"] };
 
 _default_js_defaultjs_common_utils_src_Global__WEBPACK_IMPORTED_MODULE_0__["default"].defaultjs = _default_js_defaultjs_common_utils_src_Global__WEBPACK_IMPORTED_MODULE_0__["default"].defaultjs || {};
 _default_js_defaultjs_common_utils_src_Global__WEBPACK_IMPORTED_MODULE_0__["default"].defaultjs.html = _default_js_defaultjs_common_utils_src_Global__WEBPACK_IMPORTED_MODULE_0__["default"].defaultjs.html || {};
@@ -709,7 +709,7 @@ __webpack_require__.r(__webpack_exports__);
 
 _utils_Utils__WEBPACK_IMPORTED_MODULE_0__["default"].global.defaultjs = _utils_Utils__WEBPACK_IMPORTED_MODULE_0__["default"].global.defaultjs || {};
 _utils_Utils__WEBPACK_IMPORTED_MODULE_0__["default"].global.defaultjs.extdom = _utils_Utils__WEBPACK_IMPORTED_MODULE_0__["default"].global.defaultjs.extdom || {
-	VERSION : "1.0.3",
+	VERSION : "1.0.4",
 	utils : {
 		Utils: _utils_Utils__WEBPACK_IMPORTED_MODULE_0__["default"]
 	}

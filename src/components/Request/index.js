@@ -5,6 +5,9 @@ import { Requester } from "@default-js/defaultjs-dynamic-requester"
 
 const NODENAME = toNodeName("request");
 class Request extends JsonData {
+	
+	static get NODENAME() { return NODENAME; }
+	
 	constructor() {
 		super();
 		this.style.display = "none !important";
