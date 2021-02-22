@@ -13,6 +13,8 @@ const entries = glob.sync(entryBasePath + "*/*index.js").reduce((entries, path) 
 	return entries;
 }, {});
 entries["browser-bundle"] = "./index.js";
+entries["browser-framework-bundle"] = "./browser-framework-bundle.js";
+entries["browser-full-bundle"] = "./browser-full-bundle.js";
 
 
 console.log("entries", entries);

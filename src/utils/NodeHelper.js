@@ -28,3 +28,5 @@ export const findClosestInDepth = (node, check) => {
     const closest = findClosest(node, 0, check);
     return closest != null ? closest.node : null;
 }
+
+export default {findParent, findClosestInDepth};

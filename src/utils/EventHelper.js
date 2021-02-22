@@ -17,3 +17,5 @@ export const componentEventname = (eventType, node ) => {
 export const attributeChangeEventname = (attribute, node ) => {
     return componentEventname(attributeChangeEventPrefix + "-" + attribute, node);
 };
+
+export default {componentEventname, attributeChangeEventname}

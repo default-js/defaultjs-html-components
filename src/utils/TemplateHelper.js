@@ -1,4 +1,4 @@
-import {Template} from "@default-js/defaultjs-template-language";
+import { Template } from "@default-js/defaultjs-template-language";
 export const ATTR_TEMPLATE = "template";
 
 const getTemplate = (node) => {
@@ -9,14 +9,16 @@ const getTemplate = (node) => {
 	try {
 		template = find(value).first();
 		if (!!template) return template;
-	} catch (e) {}
+	} catch (e) { }
 	return new URL(value, location.href);
 };
 
 export const loadTemplate = async (node, defaultTemplate, cache, alias) => {
 	const template = getTemplate(node);
-	if(template)
+	if (template)
 		return Template.load(template, cache, alias);
 
 	return defaultTemplate;
 };
+
+export default { ATTR_TEMPLATE, loadTemplate };
