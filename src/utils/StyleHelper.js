@@ -11,7 +11,7 @@ export const copyStyles = (source, target, append = true) => {
 
 export const CSS_BASE_PATH_VAR = "CSS_BASE_PATH";
 export const loadComponentStyle = (target) => {
-	const path = (Global[CSS_BASE_PATH_VAR] || "css") + "/" + target.nodeName;
+	const path = `${Global[CSS_BASE_PATH_VAR] || "css"}/${target.nodeName.toLowerCase()}.css`;
 	target.append(`<link rel="stylesheet" href="${path}"/>`);
 }
 

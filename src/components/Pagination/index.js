@@ -1,12 +1,11 @@
+import { privateProperty } from "@default-js/defaultjs-common-utils/src/PrivateProperty";
 import { toNodeName, define } from "../../utils/DefineComponentHelper";
 import { componentEventname } from "../../utils/EventHelper";
 import { Renderer, Template } from "@default-js/defaultjs-template-language";
 import { loadTemplate, ATTR_TEMPLATE } from "../../utils/TemplateHelper";
 import Component from "../../Component";
 
-
 const NODENAME = toNodeName("pagination");
-
 
 const TEMPLATE = Template.load(
 	`
@@ -52,64 +51,71 @@ const ATTR_DISABLED_SHADOW_DOM = "disabled-shadow-dom";
 const ATTR_DATA_PAGE = "data-page";
 const ATTRIBUTES = [ATTR_PAGE, ATTR_COUNT, ATTR_SIZE, ATTR_TEMPLATE];
 
+const EVENT__TO_PAGE = componentEventname("to-page", NODENAME);
+const EVENT__CHANGE = componentEventname("change", NODENAME);
+
+const PRIVATE__RENDERER = "renderer";
+
 class Pagination extends Component {
 	static get observedAttributes() {
 		return ATTRIBUTES;
 	}
 
-	static get NODENAME() { return NODENAME; }
+	static get NODENAME() {
+		return NODENAME;
+	}
 
 	constructor() {
 		super();
 	}
 
 	async init() {
-		const defaultTemplate = await TEMPLATE;
-		const template = await loadTemplate(this, defaultTemplate);
-		this.__root__ = this;
-		if (!this.disabledShadowDom && template != defaultTemplate) {
-			this.attachShadow({ mode: "open" });
-			this.__root__ = this.shadowRoot;
+		await super.init();
+		if (!this.ready.resolved) {
+			const defaultTemplate = await TEMPLATE;
+			const template = await loadTemplate(this, defaultTemplate);
+			if (!this.disabledShadowDom && template != defaultTemplate)
+				this.attachShadow({ mode: "open" });
+			this.root.on("click", (event) => {
+				const { target } = event;
+				let page = Number.NaN;
+				page = parseInt(target.attr(ATTR_DATA_PAGE));
+				if (Number.isNaN(page)) {
+					const parent = target.parent("[" + ATTR_DATA_PAGE + "]");
+					if (parent) page = parseInt(parent.attr(ATTR_DATA_PAGE));
+				}
+				if (!Number.isNaN(page)) {
+					this.trigger(EVENT__TO_PAGE, page);
+					event.preventDefault();
+					event.stopPropagation();
+				}
+			});
+
+			privateProperty(this, PRIVATE__RENDERER, new Renderer({ template }));
+
+			this.on(EVENT__CHANGE, () => {
+				this.render();
+			});
 		}
-		this.__root__.on("click", (event) => {
-			const { target } = event;
-			let page = Number.NaN;
-			page = parseInt(target.attr(ATTR_DATA_PAGE));
-			if (Number.isNaN(page)) {
-				const parent = target.parent("[" + ATTR_DATA_PAGE + "]");
-				if (parent) page = parseInt(parent.attr(ATTR_DATA_PAGE));
-			}
-			if (!Number.isNaN(page)) {
-				this.trigger(componentEventname("to-page", this), page);
-				event.preventDefault();
-				event.stopPropagation();
-			}
-		});
-
-		this.renderer = new Renderer({ template });
 		this.render();
-
-		this.on(componentEventname("change", this), () => {
-			this.render();
-		});
 	}
 
 	get page() {
-		return parseInt(this.attr(ATTR_PAGE));
+		return parseInt(this.attr(ATTR_PAGE) || "1");
 	}
 	set page(page) {
 		this.attr(ATTR_PAGE, page);
 	}
 
 	get count() {
-		return parseInt(this.attr(ATTR_COUNT));
+		return parseInt(this.attr(ATTR_COUNT) || "0");
 	}
 	set count(count) {
 		this.attr(ATTR_COUNT, count);
 	}
 
 	get size() {
-		return parseInt(this.attr(ATTR_SIZE));
+		return parseInt(this.attr(ATTR_SIZE) || "10");
 	}
 	set size(size) {
 		this.attr(ATTR_SIZE, size);
@@ -120,12 +126,8 @@ class Pagination extends Component {
 	}
 
 	async render() {
-		const page = parseInt(this.attr(ATTR_PAGE) || "1");
-		const count = parseInt(this.attr(ATTR_COUNT) || "0");
-		const size = parseInt(this.attr(ATTR_SIZE) || "10");
-		const data = toData(page, count, size);
-
-		this.renderer.render({ data, container: this.__root__ });
+		const renderer = privateProperty(this, PRIVATE__RENDERER);
+		renderer.render({ data: toData(this.page, this.count, this.size), container: this.root });
 	}
 }
 
