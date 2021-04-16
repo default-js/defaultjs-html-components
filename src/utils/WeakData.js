@@ -1,4 +1,4 @@
-import { defValue } from "@default-js/defaultjs-common-utils/src/ObjectUtil";
+import { defValue } from"@default-js/defaultjs-common-utils/src/ObjectUtils";
 export default class WeakData {
 	constructor() {
 		defValue(this, "weakmap", new WeakMap());
