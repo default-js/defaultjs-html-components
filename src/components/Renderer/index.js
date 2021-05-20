@@ -2,7 +2,6 @@ import Component from "../../Component";
 import { toNodeName, define } from "../../utils/DefineComponentHelper";
 import { defValue } from "@default-js/defaultjs-common-utils/src/ObjectUtils";
 import { privateProperty } from "@default-js/defaultjs-common-utils/src/PrivateProperty";
-import { lazyPromise } from "@default-js/defaultjs-common-utils/src/PromiseUtils";
 import Renderer from "@default-js/defaultjs-template-language/src/Renderer";
 import Template from "@default-js/defaultjs-template-language/src/Template";
 
@@ -13,6 +12,10 @@ const ATTRIBUTE_TEMPLATE = "template";
 const ATTRIBUTE_DATA = "data";
 const ATTRIBUTE_RENDER_MODE = "render-mode";
 const ATTRIBUTE_SHADOWMODE = "shadowmode";
+const ATTRIBUTE_CONDITION = "condition";
+
+const ATTRIBUTE_INITRUN = "initial-run";
+const ATTRIBUTE_TRIGGEREVENT = "trigger-event";
 
 const ATTRIBUTES = [ATTRIBUTE_TEMPLATE, ATTRIBUTE_DATA, ATTRIBUTE_RENDER_MODE];
 
