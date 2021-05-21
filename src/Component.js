@@ -1,9 +1,11 @@
-import { defValue } from "@default-js/defaultjs-common-utils/src/ObjectUtils";
+import {privateProperty } from "@default-js/defaultjs-common-utils/src/PrivateProperty";
 import { lazyPromise } from "@default-js/defaultjs-common-utils/src/PromiseUtils";
 import { uuid } from "@default-js/defaultjs-common-utils/src/UUID";
 import { initTimeout, triggerTimeout } from "./Constants";
 import { attributeChangeEventname, componentEventname } from "./utils/EventHelper";
 import WeakData from "./utils/WeakData";
+
+const PRIVATE_READY = "ready";
 
 const TIMEOUTS = new WeakData();
 const init = (component) => {
@@ -37,7 +39,7 @@ export const createUID = (prefix, suffix) => {
 class Component extends HTMLElement {
 	constructor({shadowRoot = false, content = null, createUID = false, uidPrefix = "id-", uidSuffix = ""} = {}) {
 		super();
-		defValue(this, "ready", lazyPromise());
+		privateProperty(this, PRIVATE_READY, lazyPromise());
 
 		if(createUID)
 			this.attr("id", createUID(uidPrefix, uidSuffix));
@@ -53,7 +55,16 @@ class Component extends HTMLElement {
 		return this.shadowRoot || this;
 	}
 
+	get ready(){
+		return privateProperty(this, PRIVATE_READY);
+	}
+
 	async init() {}
+
+	async destroy() {
+		if(this.ready.resolved)
+			privateProperty(this, PRIVATE_READY, lazyPromise());
+	}
 
 	connectedCallback() {
 		if (this.ownerDocument == document) init(this);
@@ -68,6 +79,10 @@ class Component extends HTMLElement {
 			this.trigger(triggerTimeout, attributeChangeEventname(name, this));
 			this.trigger(triggerTimeout, componentEventname("change", this));
 		}
+	}
+
+	disconnectedCallback(){
+		this.destroy();
 	}
 }
 

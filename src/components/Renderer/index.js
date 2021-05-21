@@ -1,25 +1,33 @@
 import Component from "../../Component";
 import { toNodeName, define } from "../../utils/DefineComponentHelper";
+import { componentEventname } from "../../utils/EventHelper";
 import { defValue } from "@default-js/defaultjs-common-utils/src/ObjectUtils";
 import { privateProperty } from "@default-js/defaultjs-common-utils/src/PrivateProperty";
 import Renderer from "@default-js/defaultjs-template-language/src/Renderer";
 import Template from "@default-js/defaultjs-template-language/src/Template";
+import ExpressionResolver from "@default-js/defaultjs-expression-language/src/ExpressionResolver";
 
 const NODENAME = toNodeName("renderer");
 const NODENAME_JSONDATA = toNodeName("json-data").toUpperCase();
 const NODENAME_REQUEST = toNodeName("request").toUpperCase();
+
+const EVENT_RENDERED = componentEventname("rendered", NODENAME);
+
 const ATTRIBUTE_TEMPLATE = "template";
 const ATTRIBUTE_DATA = "data";
-const ATTRIBUTE_RENDER_MODE = "render-mode";
-const ATTRIBUTE_SHADOWMODE = "shadowmode";
-const ATTRIBUTE_CONDITION = "condition";
+const ATTRIBUTE_RENDER_MODE = "render-mode"; //append, prepend, replace, self-replace
+const ATTRIBUTE_SHADOWMODE = "shadowmode"; //
 
-const ATTRIBUTE_INITRUN = "initial-run";
-const ATTRIBUTE_TRIGGEREVENT = "trigger-event";
+const ATTRIBUTE_CONDITION = "condition"; // if condtion true, than render (context???)
+const ATTRIBUTE_INITRUN = "initial-run"; // default: true
+const ATTRIBUTE_LISTEN_EVENT = "listen-event";
+const ATTRIBUTE_LISTEN_ELEMENT = "listen-element"; //default body
+const ATTRIBUTE_TRIGGER_EVENT = "trigger-event"; // trigger event on render finished
 
 const ATTRIBUTES = [ATTRIBUTE_TEMPLATE, ATTRIBUTE_DATA, ATTRIBUTE_RENDER_MODE];
 
 const PRIVATE_TEMPLATE = "template";
+const PRIVATE_LISTENER = "listener";
 const PRIVATE_DATA = "data";
 const PRIVATE_RENDER_TIMEOUT = "renderTimeout";
 
@@ -55,6 +63,47 @@ const callRender = (element) => {
 	);
 };
 
+const getListenElements = (renderer) => {
+	const selector = renderer.attr(ATTRIBUTE_LISTEN_ELEMENT);
+	if (selector) {
+		const results = find(selector);
+		if (results && results.length > 0) return results;
+	}
+
+	return document.body;
+};
+
+const addEventObserving = (renderer) => {
+	const events = renderer.attr(ATTRIBUTE_LISTEN_EVENT);
+	const element = getListenElements(renderer);
+
+	const listener = (event) => {
+		renderer.render({ event });
+	};
+
+	privateProperty(renderer, PRIVATE_LISTENER, listener);
+
+	element.on(events, listener);
+};
+
+const removeEventObserving = (renderer) => {
+	const listender = privateProperty(renderer, PRIVATE_LISTENER);
+	if (listender) {
+		const element = getListenElements(renderer);
+		element.removeEventListener(listener);
+	}
+};
+
+const triggerEvent = (renderer, content) => {
+	const events = renderer.attr(ATTRIBUTE_TRIGGER_EVENT);
+	if (events) content.trigger(events);
+	content.trigger(EVENT_RENDERED);
+};
+
+const mergeData = (data1, data2) => {
+	return Object.assign({}, data1 ? data1 : null, data2 ? data2 : null);
+};
+
 class JSTLRendererElement extends Component {
 	static get observedAttributes() {
 		return ATTRIBUTES;
@@ -78,7 +127,9 @@ class JSTLRendererElement extends Component {
 
 		if (!this.ready.resolved) {
 			privateProperty(this, PRIVATE_TEMPLATE, await loadTemplate(this));
-			await this.render();
+
+			if (this.hasAttribute(ATTRIBUTE_LISTEN_EVENT)) addEventObserving(this);
+			if (this.attr(ATTRIBUTE_INITRUN) != "false") await this.render();
 		}
 	}
 
@@ -121,8 +172,13 @@ class JSTLRendererElement extends Component {
 		privateProperty(this, PRIVATE_DATA, data);
 	}
 
-	async render({ template, data } = {}) {
+	async render({ template, data, event } = {}) {
 		const container = this.root;
+
+		let context = mergeData(data, event);
+
+		const condition = await ExpressionResolver.resolve(this.attr(ATTRIBUTE_CONDITION) || "true", context, false);
+		if (!condition) return;
 
 		if (template) template = await Template.load(template);
 		else template = await this.getTemplate(this);
@@ -131,7 +187,29 @@ class JSTLRendererElement extends Component {
 		if (!data) data = await this.getData(this);
 		if (!data) data = {};
 
-		await Renderer.render({ template, data, container, mode: this.attr(ATTRIBUTE_RENDER_MODE) });
+		context = mergeData(context, data);
+
+		let replace = false;
+		let mode = this.attr(ATTRIBUTE_RENDER_MODE);
+		if (mode == "self-replace") {
+			replace = true;
+			mode = "replace";
+		}
+
+		await Renderer.render({ template, data: context, container, mode });
+
+		if (replace) {
+			removeEventObserving(this);
+
+			const content = container.content();
+			if (content) {
+				this.replace(content);
+				triggerEvent(this, content);
+			} else {
+				triggerEvent(this, this.parent());
+				this.remove();
+			}
+		} else triggerEvent(this, this);
 	}
 
 	attributeChangedCallback(name, oldValue, newValue) {
