@@ -10,7 +10,7 @@ export const componentEventname = (eventType, node ) => {
 		nodename = node.NODENAME;
 	else throw new Error(typeof node + " is not supported as pram node!");
 	
-   return `${nodename.toLowerCase()}:${eventType}`;
+   return `${nodename.toLowerCase()}:${eventType}`;//use @ as separtor and not
 };
 
 
