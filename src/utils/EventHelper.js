@@ -10,12 +10,12 @@ export const componentEventname = (eventType, node ) => {
 		nodename = node.NODENAME;
 	else throw new Error(typeof node + " is not supported as pram node!");
 	
-   return `${nodename.toLowerCase()}:${eventType}`;//use @ as separtor and not
+   return `${nodename.toLowerCase()}:${eventType}`;//use @ as separtor and not :
 };
 
 
 export const attributeChangeEventname = (attribute, node ) => {
-    return componentEventname(attributeChangeEventPrefix + "-" + attribute, node);
+    return componentEventname(`${attributeChangeEventPrefix}-${attribute}`, node);
 };
 
 export default {componentEventname, attributeChangeEventname}

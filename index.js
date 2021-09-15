@@ -1,3 +1,3 @@
-import Component from "./src/Component";
+import Component , {ComponentBaseClassFor} from "./src/Component";
 
-export {Component};
+export {Component, ComponentBaseClassFor};

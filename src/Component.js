@@ -36,54 +36,73 @@ export const createUID = (prefix, suffix) => {
 };
 
 
-class Component extends HTMLElement {
-	constructor({shadowRoot = false, content = null, createUID = false, uidPrefix = "id-", uidSuffix = ""} = {}) {
-		super();
-		privateProperty(this, PRIVATE_READY, lazyPromise());
 
-		if(createUID)
-			this.attr("id", createUID(uidPrefix, uidSuffix));
-
-		if(shadowRoot)
-			this.attachShadow({mode:open});
-		
-		if(content)
-			this.root.append(typeof content === "function" ? content(this) : content);
-	}
-
-	get root(){
-		return this.shadowRoot || this;
-	}
-
-	get ready(){
-		return privateProperty(this, PRIVATE_READY);
-	}
-
-	async init() {}
-
-	async destroy() {
-		if(this.ready.resolved)
+const buildClass = (htmlBaseType) =>{
+	return class Component extends htmlBaseType {
+		constructor({shadowRoot = false, content = null, createUID = false, uidPrefix = "id-", uidSuffix = ""} = {}) {
+			super();
 			privateProperty(this, PRIVATE_READY, lazyPromise());
-	}
-
-	connectedCallback() {
-		if (this.ownerDocument == document) init(this);
-	}
-
-	adoptedCallback() {
-		this.connectedCallback();
-	}
-
-	attributeChangedCallback(name, oldValue, newValue) {
-		if (oldValue != newValue && this.isConnected) {
-			this.trigger(triggerTimeout, attributeChangeEventname(name, this));
-			this.trigger(triggerTimeout, componentEventname("change", this));
+	
+			if(createUID)
+				this.attr("id", createUID(uidPrefix, uidSuffix));
+	
+			if(shadowRoot)
+				this.attachShadow({mode:open});
+			
+			if(content)
+				this.root.append(typeof content === "function" ? content(this) : content);
 		}
+	
+		get root(){
+			return this.shadowRoot || this;
+		}
+	
+		get ready(){
+			return privateProperty(this, PRIVATE_READY);
+		}
+	
+		async init() {}
+	
+		async destroy() {
+			if(this.ready.resolved)
+				privateProperty(this, PRIVATE_READY, lazyPromise());
+		}
+	
+		connectedCallback() {
+			if (this.ownerDocument == document) init(this);
+		}
+	
+		adoptedCallback() {
+			this.connectedCallback();
+		}
+	
+		attributeChangedCallback(name, oldValue, newValue) {
+			if (oldValue != newValue && this.isConnected) {
+				this.trigger(triggerTimeout, attributeChangeEventname(name, this));
+				this.trigger(triggerTimeout, componentEventname("change", this));
+			}
+		}
+	
+		disconnectedCallback(){
+			this.destroy();
+		}
+	};
+} 
+
+const CLAZZMAP = new Map();
+
+export const ComponentBaseClassFor = (htmlBaseType) => {
+	let clazz = CLAZZMAP.get(htmlBaseType);
+	if(clazz == null){
+		clazz = buildClass(htmlBaseType);
+		CLAZZMAP.set(htmlBaseType, clazz);
 	}
 
-	disconnectedCallback(){
-		this.destroy();
-	}
+	return clazz;
 }
+
+const Component = ComponentBaseClassFor(HTMLElement);
+
+
 
 export default Component;

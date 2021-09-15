@@ -10,7 +10,7 @@ const getTemplate = (node) => {
 		template = find(value).first();
 		if (!!template) return template;
 	} catch (e) { }
-	return new URL(value, location.href);
+	return new URL(value, location);
 };
 
 export const loadTemplate = async (node, defaultTemplate, cache, alias) => {
