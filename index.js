@@ -1,3 +1,4 @@
-import Component , {ComponentBaseClassFor} from "./src/Component";
+import Component , {componentBaseOf} from "./src/Component";
+import {define} from "./src/utils/DefineComponentHelper";
 
-export {Component, ComponentBaseClassFor};
+export {Component, componentBaseOf, define};

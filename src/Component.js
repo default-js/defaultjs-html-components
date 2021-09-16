@@ -25,7 +25,7 @@ export const createUID = (prefix, suffix) => {
 	let count = 0;
 	let id = null;
     while(count < 100){
-		id = `${prefix}${uuid()}${suffix}`;
+		id = `${prefix ? prefix : ""}${uuid()}${suffix ? suffix : ""}`;
 		if(!document.getElementById(id))
 			return id;
 
@@ -91,7 +91,7 @@ const buildClass = (htmlBaseType) =>{
 
 const CLAZZMAP = new Map();
 
-export const ComponentBaseClassFor = (htmlBaseType) => {
+export const componentBaseOf = (htmlBaseType) => {
 	let clazz = CLAZZMAP.get(htmlBaseType);
 	if(clazz == null){
 		clazz = buildClass(htmlBaseType);
@@ -101,7 +101,7 @@ export const ComponentBaseClassFor = (htmlBaseType) => {
 	return clazz;
 }
 
-const Component = ComponentBaseClassFor(HTMLElement);
+const Component = componentBaseOf(HTMLElement);
 
 
 
