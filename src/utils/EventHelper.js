@@ -8,7 +8,7 @@ export const componentEventname = (eventType, node ) => {
 		nodename = node.nodeName;
 	else if(typeof node.NODENAME === "string")
 		nodename = node.NODENAME;
-	else throw new Error(typeof node + " is not supported as pram node!");
+	else throw new Error(`${typeof node} is not supported as parameter "node"!`);
 	
    return `${nodename.toLowerCase()}:${eventType}`;//use @ as separtor and not :
 };

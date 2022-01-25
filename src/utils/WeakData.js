@@ -15,7 +15,12 @@ export default class WeakData {
 
 	value(reference, key, value) {
 		if (arguments.length == 2) return this.data(reference)[key];
+		else if(typeof value === "undefined") delete this.data(reference)[key];
 		else this.data(reference)[key] = value;
+	}
+
+	destroy(){
+		this.weakmap.delete(reference);
 	}
 };
 

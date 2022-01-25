@@ -1,24 +1,27 @@
-import {privateProperty } from "@default-js/defaultjs-common-utils/src/PrivateProperty";
+import {privateProperty, privatePropertyAccessor } from "@default-js/defaultjs-common-utils/src/PrivateProperty";
 import { lazyPromise } from "@default-js/defaultjs-common-utils/src/PromiseUtils";
 import { uuid } from "@default-js/defaultjs-common-utils/src/UUID";
 import { initTimeout, triggerTimeout } from "./Constants";
 import { attributeChangeEventname, componentEventname } from "./utils/EventHelper";
-import WeakData from "./utils/WeakData";
 
-const PRIVATE_READY = "ready";
+const _ready = privatePropertyAccessor("ready");
 
-const TIMEOUTS = new WeakData();
+const TIMEOUTS = new WeakMap();
 const init = (component) => {
-	const data = TIMEOUTS.data(component);
-	if (data.initialize) clearTimeout(data.initialize);
+	let timeout = TIMEOUTS.get(component);
+	if (timeout) clearTimeout(timeout);
 
-	data.initialize = setTimeout(async () => {
-		delete data.initialize;
-
-		await component.init();
-		component.ready.resolve();
+	TIMEOUTS.get(component, setTimeout(async () => {
+		TIMEOUTS.delete(component);
+		try{
+			await component.init();
+			component.ready.resolve();
+		}catch(e){
+			console.error("Can't initialize component!", component, e);
+			component.ready(resolve(e));
+		}
 		component.trigger(componentEventname("initialzed", component));
-	}, initTimeout);
+	}, initTimeout));	
 };
 
 export const createUID = (prefix, suffix) => {
@@ -41,7 +44,7 @@ const buildClass = (htmlBaseType) =>{
 	return class Component extends htmlBaseType {
 		constructor({shadowRoot = false, content = null, createUID = false, uidPrefix = "id-", uidSuffix = ""} = {}) {
 			super();
-			privateProperty(this, PRIVATE_READY, lazyPromise());
+			_ready(this, lazyPromise());
 	
 			if(createUID)
 				this.attr("id", createUID(uidPrefix, uidSuffix));
@@ -58,18 +61,18 @@ const buildClass = (htmlBaseType) =>{
 		}
 	
 		get ready(){
-			return privateProperty(this, PRIVATE_READY);
+			return _ready(this);
 		}
 	
 		async init() {}
 	
 		async destroy() {
 			if(this.ready.resolved)
-				privateProperty(this, PRIVATE_READY, lazyPromise());
+			_ready(this, lazyPromise());
 		}
 	
 		connectedCallback() {
-			if (this.ownerDocument == document) init(this);
+			if (this.ownerDocument == document) init(this)();
 		}
 	
 		adoptedCallback() {
