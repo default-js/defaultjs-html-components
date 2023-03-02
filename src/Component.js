@@ -72,7 +72,7 @@ const buildClass = (htmlBaseType) =>{
 		}
 	
 		connectedCallback() {
-			if (this.ownerDocument == document) init(this);
+			if (this.ownerDocument == document && this.isConnected) init(this);
 		}
 	
 		adoptedCallback() {
