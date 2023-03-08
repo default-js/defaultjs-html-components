@@ -1,10 +1,7 @@
-import {privateProperty, privatePropertyAccessor } from "@default-js/defaultjs-common-utils/src/PrivateProperty";
 import { lazyPromise } from "@default-js/defaultjs-common-utils/src/PromiseUtils";
 import { uuid } from "@default-js/defaultjs-common-utils/src/UUID";
 import { initTimeout, triggerTimeout } from "./Constants";
 import { attributeChangeEventname, componentEventname } from "./utils/EventHelper";
-
-const _ready = privatePropertyAccessor("ready");
 
 const TIMEOUTS = new WeakMap();
 const init = (component) => {
@@ -42,15 +39,16 @@ export const createUID = (prefix, suffix) => {
 
 const buildClass = (htmlBaseType) =>{
 	return class Component extends htmlBaseType {
+
+		#ready = lazyPromise();
 		constructor({shadowRoot = false, content = null, createUID = false, uidPrefix = "id-", uidSuffix = ""} = {}) {
 			super();
-			_ready(this, lazyPromise());
 	
 			if(createUID)
 				this.attr("id", createUID(uidPrefix, uidSuffix));
 	
 			if(shadowRoot)
-				this.attachShadow({mode:open});
+				this.attachShadow({mode:"open"});
 			
 			if(content)
 				this.root.append(typeof content === "function" ? content(this) : content);
@@ -61,14 +59,14 @@ const buildClass = (htmlBaseType) =>{
 		}
 	
 		get ready(){
-			return _ready(this);
+			return this.#ready;
 		}
 	
 		async init() {}
 	
 		async destroy() {
 			if(this.ready.resolved)
-			_ready(this, lazyPromise());
+			this.#ready =  lazyPromise();
 		}
 	
 		connectedCallback() {
