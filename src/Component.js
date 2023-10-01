@@ -15,7 +15,7 @@ const init = (component) => {
 			component.ready.resolve();
 		}catch(e){
 			console.error("Can't initialize component!", component, e);
-			component.ready(resolve(e));
+			component.ready.resolve(e);
 		}
 		component.trigger(componentEventname("initialzed", component));
 	}, initTimeout));	
