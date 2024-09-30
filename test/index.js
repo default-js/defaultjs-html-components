@@ -1,2 +1,3 @@
 import "@default-js/defaultjs-extdom";
-import "./ReadyTest";
+import "./ReadyTest.js";
+import "./ComponentTest.js";

@@ -2,6 +2,9 @@ import { lazyPromise } from "@default-js/defaultjs-common-utils/src/PromiseUtils
 import { uuid } from "@default-js/defaultjs-common-utils/src/UUID";
 import { initTimeout, triggerTimeout } from "./Constants";
 import { attributeChangeEventname, componentEventname } from "./utils/EventHelper";
+import { privatePropertyAccessor } from "@default-js/defaultjs-common-utils/src/PrivateProperty";
+
+const PRIVATE_READY = privatePropertyAccessor("ready");
 
 const TIMEOUTS = new WeakMap();
 const init = (component) => {
@@ -10,12 +13,13 @@ const init = (component) => {
 
 	TIMEOUTS.get(component, setTimeout(async () => {
 		TIMEOUTS.delete(component);
+		const ready = PRIVATE_READY(component);
 		try{
 			await component.init();
-			component.ready.resolve();
+			ready.resolve();
 		}catch(e){
 			console.error("Can't initialize component!", component, e);
-			component.ready.resolve(e);
+			ready.resolve(e);
 		}
 		component.trigger(componentEventname("initialzed", component));
 	}, initTimeout));	
@@ -40,9 +44,11 @@ export const createUID = (prefix, suffix) => {
 const buildClass = (htmlBaseType) =>{
 	return class Component extends htmlBaseType {
 
-		#ready = lazyPromise();
+		
 		constructor({shadowRoot = false, content = null, createUID = false, uidPrefix = "id-", uidSuffix = ""} = {}) {
 			super();
+			PRIVATE_READY(this, lazyPromise());
+			
 	
 			if(createUID)
 				this.attr("id", createUID(uidPrefix, uidSuffix));
@@ -59,14 +65,14 @@ const buildClass = (htmlBaseType) =>{
 		}
 	
 		get ready(){
-			return this.#ready;
+			return PRIVATE_READY(this);
 		}
 	
 		async init() {}
 	
 		async destroy() {
 			if(this.ready.resolved)
-			this.#ready =  lazyPromise();
+				PRIVATE_READY(this, lazyPromise());
 		}
 	
 		connectedCallback() {
