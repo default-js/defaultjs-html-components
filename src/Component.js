@@ -34,7 +34,7 @@ const init = (component) => {
  * @param {string} [suffix]
  * @returns 
  */
-export const createUID = (prefix, suffix) => {
+export const createUUID = (prefix, suffix) => {
 	let count = 0;
 	let id = null;
 	while (count < 100) {
@@ -61,14 +61,30 @@ const buildClass = (htmlBaseType) => {
 		#ready = null;
 		#postConstructs = [];
 
-		constructor({ shadowRoot = false, content = null, createUID = false, uidPrefix = "id-", uidSuffix = "" } = {}) {
+		constructor({ shadowRoot = false, content = null, createUID = false, uidPrefix = "id-", uidSuffix = "", postConstucts = null } = {}) {
 			super();
 			this.#ready = lazyPromise();
-			if (createUID) this.#postConstructs.push(async () => this.attr("id", createUID(uidPrefix, uidSuffix)));
-
+			if (createUID) this.#postConstructs.push(async () => this.attr("id", createUUID(uidPrefix, uidSuffix)));
+			
 			if (shadowRoot) this.attachShadow({ mode: "open" });
 
 			if (content) this.root.append(typeof content === "function" ? content(this) : content);
+
+			if(postConstucts instanceof Array)
+				for(let post of postConstucts)
+					if(typeof post === "function")
+						this.#postConstructs.push(post)
+		}
+
+		
+		/**
+		 * Array of post construct functions
+		 *
+		 * @readonly
+		 * @type {Array<Function>}
+		 */
+		get postConstructs(){
+			return this.#postConstructs;
 		}
 
 		
