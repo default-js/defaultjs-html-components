@@ -1,4 +1,4 @@
-import Global from "@default-js/defaultjs-common-utils/src/Global"
+import Global from "@default-js/defaultjs-common-utils/src/Global.js";
 
 export const copyStyles = (source, target, append = true) => {
 	const styles = source.find(`style[type="text/css"], link[rel="stylesheet"]`);

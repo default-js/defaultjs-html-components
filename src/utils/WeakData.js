@@ -1,14 +1,15 @@
-import { defValue } from"@default-js/defaultjs-common-utils/src/ObjectUtils";
 export default class WeakData {
+
+	#weakmap = new WeakMap();
+
 	constructor() {
-		defValue(this, "weakmap", new WeakMap());
 	}
 
 	data(reference) {
-		let data = this.weakmap.get(reference);
+		let data = this.#weakmap.get(reference);
 		if (!data) {
 			data = {};
-			this.weakmap.set(reference, data);
+			this.#weakmap.set(reference, data);
 		}
 		return data;
 	}
@@ -20,7 +21,7 @@ export default class WeakData {
 	}
 
 	destroy(){
-		this.weakmap.delete(reference);
+		this.#weakmap.delete(reference);
 	}
 };
 

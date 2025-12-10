@@ -1,29 +1,7 @@
-import { lazyPromise } from "@default-js/defaultjs-common-utils/src/PromiseUtils";
-import { uuid } from "@default-js/defaultjs-common-utils/src/UUID";
-import { triggerTimeout } from "./Constants";
-import { attributeChangeEventname, componentEventname } from "./utils/EventHelper";
-/*
-const PRIVATE_READY = privatePropertyAccessor("ready");
-
-const TIMEOUTS = new WeakMap();
-const init = (component) => {
-	let timeout = TIMEOUTS.get(component);
-	if (timeout) clearTimeout(timeout);
-
-	TIMEOUTS.get(component, setTimeout(async () => {
-		TIMEOUTS.delete(component);
-		const ready = PRIVATE_READY(component);
-		try{
-			await component.init();
-			ready.resolve();
-		}catch(e){
-			console.error("Can't initialize component!", component, e);
-			ready.resolve(e);
-		}
-		component.trigger(componentEventname("initialzed", component));
-	}, initTimeout));	
-};
-*/
+import { lazyPromise } from "@default-js/defaultjs-common-utils/src/PromiseUtils.js";
+import { uuid } from "@default-js/defaultjs-common-utils/src/UUID.js";
+import { triggerTimeout } from "./Constants.js";
+import { attributeChangeEventname, componentEventname } from "./utils/EventHelper.js";
 
 /**
  * @function createUID

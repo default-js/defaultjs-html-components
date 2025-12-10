@@ -1,4 +1,4 @@
-import {attributeChangeEventPrefix} from "../Constants";
+import {attributeChangeEventPrefix} from "../Constants.js";
 
 /**
  * @function componentEventname

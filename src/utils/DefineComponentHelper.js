@@ -1,4 +1,4 @@
-import { componentPrefix } from "../Constants";
+import { componentPrefix } from "../Constants.js";
 
 export const toNodeName = (name, prefix) => {
 	if(typeof prefix === "string")
