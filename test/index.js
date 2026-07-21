@@ -1,3 +1,9 @@
 import "@default-js/defaultjs-extdom";
 import "./ReadyTest.js";
+import "./CreateUUIDTest.js";
+import "./WeakDataTest.js";
+import "./EventHelperTest.js";
+import "./NodeHelperTest.js";
+import "./StyleHelperTest.js";
+import "./DefineComponentHelperTest.js";
 import "./ComponentTest.js";
