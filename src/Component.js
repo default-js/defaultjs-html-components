@@ -153,14 +153,46 @@ const buildClass = (htmlBaseType) => {
 		}
 
 		/**
-		 * Runs all post-construct functions in order. Invoked automatically from
-		 * {@link Component#connectedCallback}.
+		 * Framework-internal initialization orchestrator: runs every post-construct
+		 * function in order and then the overridable {@link Component#init} hook.
+		 * Driven exclusively by {@link Component#connectedCallback} and
+		 * {@link Component#reinit}; being private, the full lifecycle can never be
+		 * triggered partially or by accident (e.g. a manual `init()` call).
 		 *
 		 * @async
-		 * @returns {Promise} resolves once every post-construct step has run.
+		 * @returns {Promise} resolves with the return value of {@link Component#init}.
+		 */
+		async #runInit() {
+			for (let func of this.#postConstructs) await func(this);
+			return await this.init();
+		}
+
+		/**
+		 * Runs the initialization orchestrator and settles {@link Component#ready}
+		 * with its result.
+		 *
+		 * @returns {Promise} the {@link Component#ready} promise.
+		 */
+		#settle() {
+			this.#runInit()
+				.then((value) => this.#ready.resolve(value))
+				.catch((error) => this.#ready.resolve(error));
+			return this.#ready;
+		}
+
+		/**
+		 * Override hook for asynchronous component setup. It runs automatically
+		 * after the post-construct functions once the component is connected, and
+		 * its return value settles {@link Component#ready}. `this.root` already
+		 * points at the render root when it runs.
+		 *
+		 * Subclasses override this freely and **must not** call `super.init()` -
+		 * the post-construct hooks are executed by the framework before this hook.
+		 *
+		 * @async
+		 * @returns {*} an optional value used to resolve `ready`.
 		 */
 		async init() {
-			for (let func of this.#postConstructs) await func(this);
 		}
 
 		/**
@@ -175,16 +207,25 @@ const buildClass = (htmlBaseType) => {
 		}
 
 		/**
-		 * Custom element lifecycle callback. Runs {@link Component#init} when the
+		 * Explicitly re-runs the full initialization (post-construct hooks and
+		 * {@link Component#init}) on an already-created component, resetting
+		 * {@link Component#ready} first when it had already settled.
+		 *
+		 * @returns {Promise} the (possibly new) {@link Component#ready} promise.
+		 */
+		reinit() {
+			if (this.#ready.resolved) this.#ready = lazyPromise();
+			return this.#settle();
+		}
+
+		/**
+		 * Custom element lifecycle callback. Runs the initialization when the
 		 * component is connected to the main document and settles the `ready`
 		 * promise with the result.
 		 */
 		connectedCallback() {
 			if (this.ownerDocument == document && this.isConnected)
-				//init(this)
-				this.init()
-					.then((value) => this.#ready.resolve(value))
-					.catch((error) => this.#ready.resolve(error));
+				this.#settle();
 		}
 
 		/**

@@ -12,6 +12,14 @@ describe("NodeHelper - ", () => {
 		root.remove();
 	});
 
+	it("findParent can match the start node itself", () => {
+		const root = create(`<div id="np-self"></div>`).first();
+		document.body.append(root);
+
+		expect(findParent(root, (node) => node.id === "np-self")).toBe(root);
+		root.remove();
+	});
+
 	it("findParent returns null when nothing matches", () => {
 		const root = create(`<div><span id="np-target-2"></span></div>`).first();
 		document.body.append(root);
@@ -27,6 +35,12 @@ describe("NodeHelper - ", () => {
 		const found = findClosestInDepth(root, (node) => node.nodeName === "LABEL");
 
 		expect(found).toBe(root.find("label.deep").first());
+	});
+
+	it("findClosestInDepth returns the first of equally shallow matches", () => {
+		const root = create(`<div><label class="a"></label><label class="b"></label></div>`).first();
+
+		expect(findClosestInDepth(root, (node) => node.nodeName === "LABEL")).toBe(root.find("label.a").first());
 	});
 
 	it("findClosestInDepth returns null when nothing matches", () => {

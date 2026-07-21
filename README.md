@@ -81,8 +81,9 @@ await el.ready;          // resolves after init() has finished
 el.ready.resolved;       // true once settled
 ```
 
-Override `init()` to run asynchronous setup. It runs after the element is
-connected, and `this.root` already points at the render root:
+Override `init()` to run asynchronous setup. It runs automatically after the
+post-construct hooks once the element is connected, and `this.root` already
+points at the render root:
 
 ```js
 class UserCard extends Component {
@@ -101,6 +102,12 @@ class UserCard extends Component {
 
 define(UserCard);
 ```
+
+> `init()` is a pure override hook — **do not call `super.init()`**. The
+> framework runs the [post-construct hooks](#post-construct-hooks) (including the
+> `createUID` id assignment) *before* `init()`, so overriding it never drops any
+> setup. Whatever `init()` returns is used to resolve `ready`. To re-run the
+> whole initialization on an already-connected component, call `await el.reinit()`.
 
 ```js
 const card = document.querySelector("d-user-card");
@@ -182,7 +189,9 @@ super({
 });
 ```
 
-The full list is available via the read-only `postConstructs` getter.
+The full list is available via the read-only `postConstructs` getter. The
+framework runs these hooks before `init()`, so overriding `init()` never
+disables them and no `super.init()` call is required.
 
 ---
 
@@ -409,15 +418,15 @@ class MyButton extends Component {
 
 ## API overview
 
-| Export            | Kind       | Description                                                        |
-| ----------------- | ---------- | ----------------------------------------------------------------- |
-| `Component`       | class      | Base class for `HTMLElement`-based components.                    |
-| `componentBaseOf` | function   | Build a component base class for any HTML element type.           |
-| `define`          | function   | Register a component as a custom element (uses its `NODENAME`).   |
-| `createUUID`      | function   | Create a document-unique id.                                      |
-| `Ready`           | function   | Create a controllable, lazy promise.                              |
-| `SETTING`         | object     | Runtime settings (`eventSeparator`).                              |
-| `utils`           | object     | `EventHelper`, `NodeHelper`, `StyleHelper`, `WeakData`, `DefineComponentHelper`. |
+| Export            | Kind     | Description                                                                      |
+| ----------------- | -------- | -------------------------------------------------------------------------------- |
+| `Component`       | class    | Base class for `HTMLElement`-based components.                                   |
+| `componentBaseOf` | function | Build a component base class for any HTML element type.                          |
+| `define`          | function | Register a component as a custom element (uses its `NODENAME`).                  |
+| `createUUID`      | function | Create a document-unique id.                                                     |
+| `Ready`           | function | Create a controllable, lazy promise.                                             |
+| `SETTING`         | object   | Runtime settings (`eventSeparator`).                                             |
+| `utils`           | object   | `EventHelper`, `NodeHelper`, `StyleHelper`, `WeakData`, `DefineComponentHelper`. |
 
 ---
 

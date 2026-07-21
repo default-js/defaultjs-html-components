@@ -44,6 +44,29 @@ class InitThrows extends Component {
 }
 define(InitThrows);
 
+class InitThrowsString extends Component {
+	static get NODENAME() { return "x-init-throws-string"; }
+	async init() { throw "nope"; }
+}
+define(InitThrowsString);
+
+let contentFnArg = null;
+class ContentFn extends Component {
+	static get NODENAME() { return "x-content-fn"; }
+	constructor() { super({ content: (self) => { contentFnArg = self; return `<i class="fn"></i>`; } }); }
+}
+define(ContentFn);
+
+class ContentNode extends Component {
+	static get NODENAME() { return "x-content-node"; }
+	constructor() {
+		const node = document.createElement("b");
+		node.className = "node";
+		super({ content: node });
+	}
+}
+define(ContentNode);
+
 class Observing extends Component {
 	static get NODENAME() { return "x-observing"; }
 	static get observedAttributes() { return ["value"]; }
@@ -84,6 +107,16 @@ describe("Component - lifecycle - ", () => {
 		el.remove();
 	});
 
+	it("resolves ready with the thrown value when init() throws a non-Error", async () => {
+		const el = create(`<x-init-throws-string></x-init-throws-string>`).first();
+		document.body.append(el);
+
+		const value = await el.ready; // resolves, does not reject
+		expect(value).toBe("nope");
+		expect(el.ready.error).toBe(false);
+		el.remove();
+	});
+
 	it("resets ready on disconnect and re-initializes on reconnect", async () => {
 		const el = await connect(create(`<x-basic></x-basic>`).first());
 		expect(el.ready.resolved).toBe(true);
@@ -93,6 +126,16 @@ describe("Component - lifecycle - ", () => {
 
 		await connect(el);
 		expect(el.ready.resolved).toBe(true);
+		el.remove();
+	});
+
+	it("runs the adopted lifecycle callback when moved to another document", async () => {
+		const el = await connect(create(`<x-basic></x-basic>`).first());
+		const other = document.implementation.createHTMLDocument("other");
+
+		other.body.append(el); // adopting into another document triggers adoptedCallback
+
+		expect(el.ownerDocument).toBe(other);
 		el.remove();
 	});
 });
@@ -111,6 +154,21 @@ describe("Component - constructor options - ", () => {
 		const el = await connect(create(`<x-uid></x-uid>`).first());
 
 		expect(el.id.startsWith("u-")).toBe(true);
+		el.remove();
+	});
+
+	it("appends content produced by a function and passes the component", async () => {
+		const el = await connect(create(`<x-content-fn></x-content-fn>`).first());
+
+		expect(el.querySelector("i.fn")).toBeTruthy();
+		expect(contentFnArg).toBe(el);
+		el.remove();
+	});
+
+	it("appends a Node passed as content", async () => {
+		const el = await connect(create(`<x-content-node></x-content-node>`).first());
+
+		expect(el.querySelector("b.node")).toBeTruthy();
 		el.remove();
 	});
 
@@ -155,6 +213,21 @@ describe("Component - constructor options - ", () => {
 		expect(warn).toHaveBeenCalled();
 	});
 
+	it("ignores non-function entries in postConstructs", async () => {
+		const ran = [];
+		class Mixed extends Component {
+			static get NODENAME() { return "x-mixed-pc"; }
+			constructor() { super({ postConstructs: [null, "nope", async () => ran.push("ok")] }); }
+		}
+		define(Mixed);
+
+		const el = new Mixed();
+		expect(el.postConstructs.length).toBe(1); // only the function is kept
+
+		await connect(el);
+		expect(ran).toEqual(["ok"]);
+	});
+
 	it("prefers postConstructs over the deprecated alias", async () => {
 		const ran = [];
 		class Both extends Component {
@@ -196,6 +269,116 @@ describe("Component - attribute events - ", () => {
 
 		expect(fired).toBe(false);
 		el.remove();
+	});
+
+	it("does not dispatch while disconnected", async () => {
+		const el = create(`<x-observing></x-observing>`).first(); // not connected
+		let fired = false;
+		el.addEventListener("x-observing--change", () => { fired = true; });
+
+		el.setAttribute("value", "1"); // observed attribute, but element is detached
+		await new Promise((r) => setTimeout(r, 100));
+
+		expect(fired).toBe(false);
+	});
+
+	it("does not dispatch when an observed attribute is set to its current value", async () => {
+		const el = await connect(create(`<x-observing value="1"></x-observing>`).first());
+		let count = 0;
+		el.addEventListener("x-observing--change", () => { count++; });
+
+		el.setAttribute("value", "1"); // unchanged value
+		await new Promise((r) => setTimeout(r, 100));
+
+		expect(count).toBe(0);
+		el.remove();
+	});
+});
+
+describe("Component - init override with postConstructs - ", () => {
+	it("runs the postConstructs via super.init() together with the overridden init()", async () => {
+		const calls = [];
+
+		class Widget extends Component {
+			static get NODENAME() { return "x-widget"; }
+
+			constructor() {
+				super({
+					shadowRoot: true,
+					postConstructs: [
+						async (self) => { calls.push("pc1"); self.root.append(`<span class="pc1"></span>`); },
+						async (self) => { calls.push("pc2"); self.dataset.pc2 = "done"; },
+					],
+				});
+			}
+
+			async init() {
+				// no super.init() needed — the post-construct hooks run before this
+				calls.push("init");
+				this.root.append(`<b class="init"></b>`);
+				this.initialized = true;
+				return "widget-ready";
+			}
+		}
+		define(Widget);
+
+		const el = new Widget();
+		await connect(el);
+
+		// both post-construct functions ran, in order, before the overridden init body
+		expect(calls).toEqual(["pc1", "pc2", "init"]);
+		expect(el.postConstructs.length).toBe(2);
+
+		// side effects of the post-construct functions are present
+		expect(el.shadowRoot.querySelector("span.pc1")).toBeTruthy();
+		expect(el.dataset.pc2).toBe("done");
+
+		// the overridden init() ran to completion
+		expect(el.initialized).toBe(true);
+		expect(el.shadowRoot.querySelector("b.init")).toBeTruthy();
+
+		// init()'s return value settled `ready`
+		expect(el.ready.resolved).toBe(true);
+		expect(await el.ready).toBe("widget-ready");
+
+		el.remove();
+	});
+
+	it("reinit() resets ready and re-runs the post-construct hooks and init()", async () => {
+		let runs = 0;
+		class Reinitable extends Component {
+			static get NODENAME() { return "x-reinit"; }
+			constructor() { super({ postConstructs: [async () => { runs++; }] }); }
+			async init() { return runs; }
+		}
+		define(Reinitable);
+
+		const el = await connect(new Reinitable());
+		expect(runs).toBe(1);
+		expect(await el.ready).toBe(1);
+
+		const ready = el.reinit();
+		expect(el.ready.resolved).toBe(false); // reset because it had already settled
+
+		await ready;
+		expect(runs).toBe(2);
+		expect(await el.ready).toBe(2);
+		el.remove();
+	});
+
+	it("reinit() keeps a still-pending ready promise", () => {
+		class Pending extends Component {
+			static get NODENAME() { return "x-reinit-pending"; }
+		}
+		define(Pending);
+
+		const el = new Pending(); // not connected -> ready still pending
+		const before = el.ready;
+		expect(el.ready.resolved).toBe(false);
+
+		el.reinit();
+
+		expect(el.ready).toBe(before); // not reset, since it had not settled yet
 	});
 });
 

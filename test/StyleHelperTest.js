@@ -33,4 +33,13 @@ describe("StyleHelper - ", () => {
 		expect(target.find(`link[rel="stylesheet"]`).first()).toBeTruthy();
 		expect(target.find(`p`).first()).toBeFalsy(); // only styles are copied
 	});
+
+	it("copyStyles can prepend the cloned nodes", () => {
+		const source = create(`<div><style type="text/css">.a{}</style></div>`).first();
+		const target = create(`<div><span class="first"></span></div>`).first();
+
+		copyStyles(source, target, false);
+
+		expect(target.firstChild.nodeName).toBe("STYLE");
+	});
 });

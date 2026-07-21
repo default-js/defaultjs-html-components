@@ -64,10 +64,16 @@ export interface Component {
 	readonly root: HTMLElement | ShadowRoot;
 	/** Promise that resolves once {@link Component.init} has completed. */
 	readonly ready: LazyPromise;
-	/** Runs all post-construct functions in order. */
-	init(): Promise<void>;
+	/**
+	 * Override hook for asynchronous setup. Runs automatically after the
+	 * post-construct hooks once connected; its return value settles `ready`.
+	 * Do **not** call `super.init()` — the hooks are run by the framework.
+	 */
+	init(): any | Promise<any>;
 	/** Resets the `ready` promise so the component can be initialized again. */
 	destroy(): Promise<void>;
+	/** Explicitly re-runs the full initialization (post-construct hooks + init). */
+	reinit(): LazyPromise;
 	connectedCallback(): void;
 	adoptedCallback(): void;
 	attributeChangedCallback(name: string, oldValue: string | null, newValue: string | null): void;

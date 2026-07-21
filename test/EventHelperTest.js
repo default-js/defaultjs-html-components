@@ -31,6 +31,10 @@ describe("EventHelper - ", () => {
 		expect(attributeChangeEventname("disabled", "d-foo")).toBe("d-foo--attribute--disabled");
 	});
 
+	it("attributeChangeEventname honors a custom separator", () => {
+		expect(attributeChangeEventname("value", "d-foo", ":")).toBe("d-foo:attribute:value");
+	});
+
 	it("defaults to SETTING.eventSeparator", () => {
 		const previous = SETTING.eventSeparator;
 		SETTING.eventSeparator = ":";

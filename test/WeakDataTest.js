@@ -40,4 +40,19 @@ describe("WeakData - ", () => {
 
 		expect(wd.value(ref, "k")).toBeUndefined();
 	});
+
+	it("keeps data isolated per reference", () => {
+		const wd = new WeakData();
+		const a = {};
+		const b = {};
+		wd.value(a, "k", "A");
+		wd.value(b, "k", "B");
+
+		expect(wd.value(a, "k")).toBe("A");
+		expect(wd.value(b, "k")).toBe("B");
+
+		wd.destroy(a);
+		expect(wd.value(a, "k")).toBeUndefined();
+		expect(wd.value(b, "k")).toBe("B"); // unaffected by destroying `a`
+	});
 });
