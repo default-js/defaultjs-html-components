@@ -1,17 +1,24 @@
-import {attributeChangeEventPrefix} from "../Constants.js";
+import {attributeChangeEventPrefix, SETTING} from "../Constants.js";
 
 /**
- * @function componentEventname
- * 
- * creates an event name for an component
- * 
- * @param {string} eventType 
- * @param {string|HTMLElement|Component} node 
- * @param {string} [separator] default is ":"
- * 
- * @returns {string} 
+ * @module utils/EventHelper
+ *
+ * Helpers to build the event names dispatched by components.
  */
-export const componentEventname = (eventType, node, separator = ":" ) => {	
+
+/**
+ * Creates the event name for a component event, composed of the node's tag
+ * name, the `separator` and the `eventType`.
+ *
+ * @param {string} eventType - the event type, e.g. `"change"`.
+ * @param {string|HTMLElement|Component} node - the node the event belongs to.
+ *   A string is used verbatim as node name; an {@link HTMLElement} contributes
+ *   its `nodeName`; any other object must expose a string `NODENAME`.
+ * @param {string} [separator=SETTING.eventSeparator] - separator between node name and event type; defaults to `"--"`.
+ * @returns {string} the lower-cased event name.
+ * @throws {Error} when `node` is not a supported type.
+ */
+export const componentEventname = (eventType, node, separator = SETTING.eventSeparator ) => {
 	let nodename = "unsupported";
 	if(typeof node === "string")
 		nodename = node;
@@ -20,21 +27,21 @@ export const componentEventname = (eventType, node, separator = ":" ) => {
 	else if(typeof node.NODENAME === "string")
 		nodename = node.NODENAME;
 	else throw new Error(`${typeof node} is not supported as parameter "node"!`);
-	
-   return `${nodename.toLowerCase()}${separator}${eventType}`;//use @ as separtor and not :
+
+   return `${nodename.toLowerCase()}${separator}${eventType}`;
 };
 
 /**
- * @function attributeChangeEventname
- *  * 
- * @param {string} attribute 
- * @param {string|HTMLElement|Component} node 
- * @param {string} [separator] default is ":"
- * 
- * @returns {string}
+ * Creates the event name dispatched when a component's attribute changes,
+ * e.g. `d-button--attribute--disabled`.
+ *
+ * @param {string} attribute - the name of the changed attribute.
+ * @param {string|HTMLElement|Component} node - the node the event belongs to (see {@link componentEventname}).
+ * @param {string} [separator=SETTING.eventSeparator] - separator used within the event name; defaults to `"--"`.
+ * @returns {string} the attribute-change event name.
  */
-export const attributeChangeEventname = (attribute, node, separator = ":"  ) => {
-    return componentEventname(`${attributeChangeEventPrefix}-${attribute}`, node, separator);
+export const attributeChangeEventname = (attribute, node, separator = SETTING.eventSeparator  ) => {
+    return componentEventname(`${attributeChangeEventPrefix}${separator}${attribute}`, node, separator);
 };
 
 export default {componentEventname, attributeChangeEventname}

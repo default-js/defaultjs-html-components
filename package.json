@@ -1,9 +1,10 @@
 {
 	"name": "@default-js/defaultjs-html-components",
 	"buildname": "defaultjs-html-components",
-	"version": "2.1.14",
+	"version": "3.0.0",
 	"description": "toolbox to build async web components",
 	"main": "./index.js",
+	"types": "./index.d.ts",
 	"scripts": {
 		"build:dev": "webpack --mode=development --progress",
 		"build:prod": "webpack --mode=production --progress",
@@ -16,12 +17,16 @@
 	"author": "Frank Schüler",
 	"license": "MIT",
 	"devDependencies": {
+		"@babel/core": "^7.29.7",
+		"babel-loader": "^10.1.1",
+		"babel-plugin-istanbul": "^8.0.0",
 		"clean-webpack-plugin": "^1.0.1",
 		"copy-webpack-plugin": "^11.0.0",
 		"http-server": "^14.1.0",
 		"karma": "^6.3.4",
 		"karma-chrome-launcher": "^3.1.0",
 		"karma-coverage": "^2.0.3",
+		"karma-coverage-istanbul-reporter": "^3.0.3",
 		"karma-firefox-launcher": "^2.1.1",
 		"karma-html2js-preprocessor": "^1.1.0",
 		"karma-jasmine": "^4.0.1",
@@ -53,6 +58,7 @@
 	},
 	"files": [
 		"index.js",
+		"index.d.ts",
 		"browser.js",
 		"src/**",
 		"dist/**",

@@ -1,7 +1,26 @@
 const path = require("path");
-const webpack = require("./webpack.config.js");
+const webpackFactory = require("./webpack.config.js");
 const puppeteer = require("puppeteer");
 process.env.CHROME_BIN = puppeteer.executablePath();
+
+// Base webpack config used for the test bundle, extended with istanbul
+// instrumentation of the `src` sources so karma can report code coverage.
+const webpack = webpackFactory({}, { mode: "development", target: "target" });
+webpack.module = webpack.module || {};
+webpack.module.rules = (webpack.module.rules || []).concat([
+	{
+		test: /\.js$/,
+		include: path.resolve(__dirname, "src"),
+		use: {
+			loader: "babel-loader",
+			options: {
+				babelrc: false,
+				configFile: false,
+				plugins: ["babel-plugin-istanbul"],
+			},
+		},
+	},
+]);
 
 module.exports = function (config) {
 	config.set({
@@ -11,45 +30,39 @@ module.exports = function (config) {
 		// frameworks to use
 		// available frameworks: https://npmjs.org/browse/keyword/karma-adapter
 		frameworks: ["jasmine", "webpack"],
-		plugins: ["karma-webpack", "karma-jasmine", "karma-coverage", "karma-html2js-preprocessor", "karma-sourcemap-loader", "karma-firefox-launcher", "karma-chrome-launcher", "karma-safari-launcher"],
-		// list of files / patterns to load in the browser
-		files: [
-			//"src/**/*.js",
-			"test/index.js",
-			//"test/**/*Test.js",
-			"test/sites/**/*.html",
-			{ pattern: "test/data/**/*", included: false, served: true, watched: false, nocache: false },
-			{ pattern: "test/templates/**/*", included: false, served: true, watched: true, nocache: false },
+		plugins: [
+			"karma-webpack",
+			"karma-jasmine",
+			"karma-coverage-istanbul-reporter",
+			"karma-sourcemap-loader",
+			"karma-firefox-launcher",
+			"karma-chrome-launcher",
+			"karma-safari-launcher",
 		],
-		proxies: {
-			"/data/": "/base/test/data/",
-			"/templates/": "/base/test/templates/",
-		},
+		// list of files / patterns to load in the browser
+		files: ["test/index.js"],
 		// list of files / patterns to exclude
 		exclude: ["node_modules/*"],
 		// available preprocessors:
 		// https://npmjs.org/browse/keyword/karma-preprocessor
 		preprocessors: {
-			"src/**/*.js": ["webpack", "coverage"],
 			"test/index.js": ["webpack", "sourcemap"],
-			//"test/**/*Test.js" : [ "webpack", "sourcemap"],
-			"test/sites/**/*.html": ["html2js"],
 		},
 		// test results reporter to use
 		// possible values: "dots", "progress"
 		// available reporters: https://npmjs.org/browse/keyword/karma-reporter
-		reporters: ["progress", "coverage"],
-		coverageReporter: {
-			dir: "coverage/",
-			reporters: [
-				{ type: "html", subdir: "report-html" },
-				{ type: "lcov", subdir: "report-lcov" },
-				{ type: "cobertura", subdir: ".", file: "cobertura.txt" },
-				{ type: "lcovonly", subdir: ".", file: "report-lcovonly.txt" },
-				{ type: "teamcity", subdir: ".", file: "teamcity.txt" },
-				{ type: "text", subdir: ".", file: "text.txt" },
-				{ type: "text-summary", subdir: ".", file: "text-summary.txt" },
-			],
+		reporters: ["progress", "coverage-istanbul"],
+		coverageIstanbulReporter: {
+			reports: ["text-summary", "text", "html", "lcovonly", "cobertura"],
+			dir: path.join(__dirname, "coverage"),
+			combineBrowserReports: true,
+			fixWebpackSourcePaths: true,
+			"report-config": {
+				html: { subdir: "report-html" },
+				lcovonly: { subdir: ".", file: "report-lcovonly.txt" },
+				cobertura: { subdir: ".", file: "cobertura.txt" },
+				text: { subdir: ".", file: "text.txt" },
+			},
 		},
 		logLevel: config.LOG_INFO,
 		browsers: [config.autoWatch ? "Chrome" : "ChromeHeadless"],
@@ -65,6 +78,6 @@ module.exports = function (config) {
 		},
 		browserDisconnectTimeout: 60000,
 		browserNoActivityTimeout: 60000,
-		webpack: webpack({}, { mode: "development", target: "target" })
+		webpack,
 	});
 };

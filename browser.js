@@ -1,13 +1,10 @@
-import "@default-js/defaultjs-extdom";
-import GLOBAL from "@default-js/defaultjs-common-utils/src/Global";
-import utils from "./src/utils";
-import Ready from "./src/Ready";
-import Component, {componentBaseOf, createUUID} from "./src/Component";
+import { GLOBAL } from "./src/Constants.js";
+import { utils, Ready, Component, componentBaseOf, define, createUUID, SETTING } from "./index.js";
 
-const pack = {VERSION : "${version}", utils, Ready, Component, componentBaseOf, createUUID };
+const pack = { VERSION: "${version}", utils, Ready, Component, define, componentBaseOf, createUUID, SETTING };
 
 GLOBAL.defaultjs = GLOBAL.defaultjs || {};
 GLOBAL.defaultjs.html = GLOBAL.defaultjs.html || {};
 GLOBAL.defaultjs.html.components = GLOBAL.defaultjs.html.components || pack;
 
-export { utils, Ready, Component, componentBaseOf, createUUID };
+export { utils, Ready, Component, componentBaseOf, createUUID, define, SETTING };
